@@ -24,7 +24,6 @@
             transition: background-color 0.3s;
         }
 
-        /* ambient overlay */
         .ambient-overlay {
             position: fixed;
             top: 0;
@@ -36,7 +35,6 @@
             pointer-events: none;
         }
 
-        /* glass container */
         .glass-wrapper {
             max-width: 1400px;
             margin: 0 auto;
@@ -48,7 +46,6 @@
             padding: 1.5rem;
         }
 
-        /* header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -94,7 +91,6 @@
             background: rgba(255,215,0,0.3);
         }
 
-        /* search + categories */
         .search-section {
             margin-bottom: 2rem;
         }
@@ -145,7 +141,6 @@
             border-color: #FFD700;
         }
 
-        /* top 10 carousel */
         .top10-container {
             margin-bottom: 2rem;
         }
@@ -187,7 +182,6 @@
             text-align: center;
         }
 
-        /* infinite scroll grid */
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -236,7 +230,6 @@
             z-index: 2;
         }
 
-        /* player section */
         .player-section {
             margin-top: 2rem;
             display: none;
@@ -355,18 +348,15 @@
         </div>
     </div>
 
-    <!-- Top 10 -->
     <div class="top10-container" id="top10Container">
         <div class="section-title">🏆 Top 10 This Week</div>
         <div class="carousel" id="top10Carousel"></div>
     </div>
 
-    <!-- Infinite scroll grid -->
     <div id="moviesContainer">
         <div class="loading-spinner">🎬 Loading...</div>
     </div>
 
-    <!-- Player -->
     <div id="playerSection" class="player-section">
         <div class="player-glass">
             <div class="player-header">
@@ -387,15 +377,13 @@
 </div>
 
 <script>
-    // ---------- TMDB API ----------
     const TMDB_API_KEY = "8af9b49a95ed3ebb5d577d1e0bdfb868";
     const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 
-    // ---------- Embed Providers (Movie, TV, Anime) + Hindi variants ----------
     const PROVIDERS = {
         movie: {
             original: [
-                "https://vidsrc.xyz/embed/movie/{id}",      // fastest usually
+                "https://vidsrc.xyz/embed/movie/{id}",
                 "https://2embed.cc/embed/movie/{id}",
                 "https://primeplay.me/embed/movie/{id}",
                 "https://www.vidking.net/embed/movie/{id}",
@@ -403,7 +391,7 @@
                 "https://movieninja.xyz/embed/movie/{id}"
             ],
             hindi: [
-                "https://vidsrc.xyz/embed/movie/{id}?hindi",   // some support
+                "https://vidsrc.xyz/embed/movie/{id}?hindi",
                 "https://hindimovies.xyz/embed/movie/{id}",
                 "https://www.hindilinks4u.to/embed/{id}",
                 "https://moviehindi.net/embed/{id}",
@@ -437,7 +425,6 @@
         }
     };
 
-    // Helper: replace placeholders
     function embedUrl(template, id, season = null, episode = null) {
         let url = template.replace("{id}", id);
         if (season !== null && episode !== null) {
@@ -446,7 +433,6 @@
         return url;
     }
 
-    // State
     let currentMediaType = "movie";
     let currentCategory = "trending";
     let currentPage = 1;
@@ -459,13 +445,10 @@
     let currentSeason = null, currentEpisode = null;
     let resumeData = JSON.parse(localStorage.getItem('resumeWatching')) || null;
 
-    // Speed test: measure fetch time (HEAD request) for each server, pick fastest
     async function findFastestServer(urls) {
         const results = await Promise.any(urls.map(async (url, idx) => {
             const start = performance.now();
             try {
-                // Use fetch with no-cors to just check response, but we only care about timing
-                // We'll use a simple Image() trick for iframe sources? Actually we can just ping with fetch.
                 await fetch(url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' });
                 const duration = performance.now() - start;
                 return { idx, duration, url };
@@ -474,7 +457,7 @@
             }
         }).catch(() => []));
         if (results && results.idx !== undefined) return results.idx;
-        return 0; // default first
+        return 0;
     }
 
     async function autoSwitchFastest() {
@@ -487,11 +470,10 @@
         }
     }
 
-    // Load embed with sandbox to prevent redirects
+    // *************** REMOVED SANDBOX ***************
     function loadEmbed(index) {
         const url = currentServerUrls[index];
-        const sandboxAttr = "allow-same-origin allow-scripts allow-popups allow-forms allow-modals"; // no allow-top-navigation
-        const iframeHtml = `<iframe src="${url}" sandbox="${sandboxAttr}" referrerpolicy="no-referrer" allowfullscreen allow="autoplay; encrypted-media" frameborder="0"></iframe>`;
+        const iframeHtml = `<iframe src="${url}" referrerpolicy="no-referrer" allowfullscreen allow="autoplay; encrypted-media" frameborder="0"></iframe>`;
         document.getElementById('videoWrapper').innerHTML = iframeHtml;
         document.getElementById('currentServerInfo').innerHTML = `🔗 Server ${index+1} · ${new URL(url).hostname}`;
     }
@@ -513,7 +495,6 @@
         });
     }
 
-    // Play functions
     async function playMovie(id, title) {
         currentPlayingItem = { type: 'movie', id, title };
         const providers = isHindiMode ? PROVIDERS.movie.hindi : PROVIDERS.movie.original;
@@ -522,10 +503,8 @@
         showPlayer(title);
         loadEmbed(0);
         updateServerButtons();
-        await autoSwitchFastest(); // optional auto fastest after load
-        // Save resume
+        await autoSwitchFastest();
         localStorage.setItem('resumeWatching', JSON.stringify({ type: 'movie', id, title, timestamp: Date.now() }));
-        // Ambient color
         fetchPosterAndAmbient(id, 'movie');
     }
 
@@ -544,7 +523,7 @@
         updateServerButtons();
         autoSwitchFastest();
         localStorage.setItem('resumeWatching', JSON.stringify({ type: 'anime', id, title, timestamp: Date.now() }));
-        fetchPosterAndAmbient(id, 'tv'); // approximate
+        fetchPosterAndAmbient(id, 'tv');
     }
 
     function showEpisodeSelector(tvId, title) {
@@ -558,7 +537,6 @@
             <span>Episode:</span> <select id="episodeSelect"><option value="1">1</option></select>
             <button id="playEpBtn">▶ Play</button>
         `;
-        // Fetch actual seasons from TMDB (simplified)
         fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`)
             .then(res => res.json())
             .then(data => {
@@ -591,7 +569,6 @@
     }
 
     function updateEpisodeSelect(season) {
-        // simple: assume 12 episodes max
         const epSelect = document.getElementById('episodeSelect');
         epSelect.innerHTML = '';
         for (let i = 1; i <= 20; i++) {
@@ -621,7 +598,6 @@
             });
     }
 
-    // Ambient mode using ColorThief
     let ambientEnabled = true;
     const colorThief = new ColorThief();
     function setAmbientColor(imageUrl) {
@@ -638,7 +614,6 @@
         };
     }
 
-    // Infinite scroll
     function setupInfiniteScroll() {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && hasMore) {
@@ -710,7 +685,6 @@
         });
     }
 
-    // Load top 10
     async function loadTop10() {
         const data = await (await fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_API_KEY}`)).json();
         const movies = data.results.slice(0, 10);
@@ -728,7 +702,6 @@
         });
     }
 
-    // Category switching
     function attachCategoryEvents() {
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -750,7 +723,6 @@
         });
     }
 
-    // Search
     document.getElementById('searchBtn').addEventListener('click', async () => {
         const query = document.getElementById('searchInput').value;
         if (!query) return;
@@ -779,12 +751,10 @@
         container.appendChild(grid);
     });
 
-    // Language toggle
     document.getElementById('langToggleBtn').addEventListener('click', () => {
         isHindiMode = !isHindiMode;
         document.getElementById('langToggleBtn').style.background = isHindiMode ? '#e67e22' : '';
         if (currentPlayingItem) {
-            // Reload current content with new language
             if (currentPlayingItem.type === 'movie') playMovie(currentPlayingItem.id, currentPlayingItem.title);
             else if (currentPlayingItem.type === 'tv' && currentSeason && currentEpisode) {
                 const providers = isHindiMode ? PROVIDERS.tv.hindi : PROVIDERS.tv.original;
@@ -811,14 +781,12 @@
         if (currentServerUrls.length) autoSwitchFastest();
     });
 
-    // Resume check
     if (resumeData && confirm(`Resume watching "${resumeData.title}"?`)) {
         if (resumeData.type === 'movie') playMovie(resumeData.id, resumeData.title);
         else if (resumeData.type === 'tv') playTVSeries(resumeData.id, resumeData.title);
         else if (resumeData.type === 'anime') playAnime(resumeData.id, resumeData.title);
     }
 
-    // Initialize
     loadTop10();
     loadContent(true);
     attachCategoryEvents();
