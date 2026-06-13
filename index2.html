@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>UV's Movie World - Stream Movies, TV Shows & Anime</title>
+    <meta name="description" content="Watch latest movies, TV series, and anime online in HD. Free streaming with multiple servers and ambient mode.">
+    <meta name="keywords" content="movie streaming, watch movies online, free movies, anime streaming, hindi movies">
+    <meta name="theme-color" content="#0a0f1e">
+    <!-- Favicon (inline SVG + fallback) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%234f46e5'/%3E%3Ctext x='50' y='68' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3EUV%3C/text%3E%3C/svg%3E">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAkCAYAAADhAJiYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTM0A1t6AAAAIHRFWHRDb3B5cmlnaHQAQ29weXJpZ2h0IChDKSAyMDIwIFRIRSD/QpUAAAAZdEVYdERlc2NyaXB0aW9uAAAAAABUViBTZXJpZXMqzZpwAAAAJXRFWHRUaXRsZQAAAAAAVFYgU2VyaWVzOiBUaGUgRmxpcCAtIEV4aXQgU3RhZ2XMaw8AAABHdEVYdFNvZnR3YXJlAFJlYWRTdHJlYW0gR1RQIEBodHRwOi8vbWlyb3IuY3MudmlyZ2luaWEuZWR1LyBjZ2ktYmluL2NnZ2k/Y3M9cHVicyAoQ29weWxlZnQpRwAAAB90RVh0Q29weXJpZ2h0AENvcHlyaWdodCAoQykgMjAyMCBUaGUg/VLUAAAAHnRFWHRDb3B5cmlnaHQAQ29weXJpZ2h0IChDKSAyMDIwIFRoZSD+UAAAAABJRU5ErkJggg==">
+    <!-- Include Color Thief for ambient mode -->
+    <script src="https://cdn.jsdelivr.net/npm/colorthief@2.3.2/dist/color-thief.umd.js"></script>
+    <!-- Three.js for WebGL background -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #0a0f1e, #020408);
+            min-height: 100vh;
+            color: white;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Ambient mode overlay */
+        .ambient-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            transition: background 0.5s ease;
+        }
+        canvas#webgl-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        /* Glass container */
+        .glass-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(12, 20, 35, 0.4);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        /* Header with logo */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 1rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo svg {
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 0 5px #4f46e5);
+        }
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaccff, #7aa2f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .ambient-toggle {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Search + categories */
+        .search-section {
+            margin-bottom: 2rem;
+        }
+        .search-bar {
+            display: flex;
+            gap: 0.8rem;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3rem;
+            padding: 0.2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .search-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .search-bar button {
+            background: linear-gradient(95deg, #4f46e5, #7c3aed);
+            border: none;
+            padding: 0 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        .cat-btn {
+            background: rgba(255,255,255,0.05);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .cat-btn.active {
+            background: #4f46e5;
+            box-shadow: 0 0 8px #4f46e5;
+        }
+        .cat-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Top 10 Carousel */
+        .top10-container {
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .carousel {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 0.5rem 0;
+        }
+        .carousel-item {
+            min-width: 180px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 1rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .carousel-item:hover {
+            transform: scale(1.02);
+        }
+        .carousel-item img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+        .carousel-item .info {
+            padding: 0.5rem;
+        }
+        .carousel-item h4 {
+            font-size: 0.9rem;
+        }
+
+        /* Movies Grid (infinite scroll) */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .movie-card {
+            background: rgba(20, 30, 50, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 1.2rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            position: relative;
+        }
+        .movie-card:hover {
+            transform: translateY(-8px);
+            border-color: #7aa2f7;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+        .movie-card img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+        }
+        .movie-card .info {
+            padding: 0.7rem;
+        }
+        .movie-card .info h3 {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .hindi-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e50914;
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        /* Player Section */
+        .player-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        .player-glass {
+            background: rgba(0,0,0,0.7);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            backdrop-filter: blur(20px);
+        }
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .server-switch {
+            background: #1a1a2e;
+            border-radius: 2rem;
+            padding: 0.2rem;
+            display: flex;
+            gap: 0.3rem;
+        }
+        .server-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .server-btn.active {
+            background: #4f46e5;
+        }
+        .close-player {
+            background: #dc2626;
+            border: none;
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .episode-selector {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 640px) {
+            .glass-wrapper { padding: 1rem; }
+            .movies-grid { gap: 0.8rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+<div id="ambientOverlay" class="ambient-overlay"></div>
+<canvas id="webgl-bg"></canvas>
+
+<div class="glass-wrapper">
+    <div class="header">
+        <div class="logo">
+            <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="20" fill="url(#grad)"/>
+                <defs>
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4f46e5"/>
+                        <stop offset="100%" stop-color="#7c3aed"/>
+                    </linearGradient>
+                </defs>
+                <text x="50" y="68" font-size="44" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-weight="bold">UV</text>
+            </svg>
+            <span class="logo-text">UV's Movie World</span>
+        </div>
+        <div class="header-right">
+            <button class="ambient-toggle" id="ambientToggle">🌙 Ambient On</button>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search movies, TV shows, anime...">
+            <button id="searchBtn">🔍</button>
+        </div>
+        <div class="categories" id="categoriesContainer">
+            <div class="cat-btn active" data-type="movie" data-cat="trending">🔥 Trending</div>
+            <div class="cat-btn" data-type="movie" data-cat="popular">⭐ Popular</div>
+            <div class="cat-btn" data-type="movie" data-cat="top_rated">🏆 Top Rated</div>
+            <div class="cat-btn" data-type="tv" data-cat="trending">📺 TV Series</div>
+            <div class="cat-btn" data-type="anime" data-cat="trending">🎌 Anime</div>
+        </div>
+    </div>
+
+    <!-- Top 10 Carousel -->
+    <div class="top10-container" id="top10Container">
+        <div class="section-title">🏆 Top 10 Movies This Week</div>
+        <div class="carousel" id="top10Carousel"></div>
+    </div>
+
+    <!-- Infinite scroll grid -->
+    <div id="moviesContainer">
+        <div class="loading">🎬 Loading movies...</div>
+    </div>
+
+    <!-- Player -->
+    <div id="playerSection" class="player-section">
+        <div class="player-glass">
+            <div class="player-header">
+                <div id="playerTitle"></div>
+                <div class="server-switch" id="serverSwitch"></div>
+                <button class="close-player" id="closePlayerBtn">✕ Close</button>
+            </div>
+            <div id="episodeSelector" class="episode-selector" style="display: none;"></div>
+            <div class="video-wrapper" id="videoWrapper"></div>
+            <div id="currentServerInfo" style="font-size:0.7rem; margin-top:8px; text-align:center;"></div>
+        </div>
+    </div>
+
+    <footer>⚠️ DISCLAIMER: This site does not host any videos. All content is embedded from third-party servers. For copyright complaints, contact the respective embed providers. We respect DMCA.</footer>
+</div>
+
+<script type="module">
+    import * as THREE from 'three';
+
+    // --- WebGL Background ---
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-bg'), alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    const geometry = new THREE.SphereGeometry(1, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ color: 0x4f46e5, wireframe: true });
+    const sphere = new THREE.Mesh(geometry, material);
+    scene.add(sphere);
+    camera.position.z = 3;
+    function animate() {
+        requestAnimationFrame(animate);
+        sphere.rotation.x += 0.005;
+        sphere.rotation.y += 0.01;
+        renderer.render(scene, camera);
+    }
+    animate();
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+
+    // --- TMDB API & Config ---
+    const TMDB_API_KEY = "8af9b49a95ed3ebb5d577d1e0bdfb868";
+    const IMG_BASE = "https://image.tmdb.org/t/p/w300";
+    let currentMediaType = "movie";
+    let currentCategory = "trending";
+    let currentPage = 1;
+    let isLoading = false;
+    let hasMore = true;
+    let currentPlayingItem = null;
+    let currentEmbedIndex = 0;
+    let currentServerList = [];
+    let resumeData = JSON.parse(localStorage.getItem('resumeWatching')) || null;
+
+    // Embed providers for movie, tv, anime
+    const EMBED = {
+        movie: [
+            (id) => `https://www.vidking.net/embed/movie/${id}`,
+            (id) => `https://vidsrc.xyz/embed/movie/${id}`,
+            (id) => `https://2embed.cc/embed/movie/${id}`,
+            (id) => `https://primeplay.me/embed/movie/${id}`
+        ],
+        tv: [
+            (id, s, e) => `https://www.vidking.net/embed/tv/${id}/${s}/${e}`,
+            (id, s, e) => `https://vidsrc.xyz/embed/tv/${id}/${s}/${e}`,
+            (id, s, e) => `https://2embed.cc/embed/tv/${id}/${s}/${e}`
+        ],
+        anime: [
+            (id) => `https://gogoanime.ee/embed/${id}`,
+            (id) => `https://zoro.to/embed/${id}`,
+            (id) => `https://animepahe.ru/embed/${id}`,
+            (id) => `https://allanime.site/embed/${id}`
+        ]
+    };
+
+    async function tmdbFetch(url) {
+        const sep = url.includes('?') ? '&' : '?';
+        const res = await fetch(`${url}${sep}api_key=${TMDB_API_KEY}`);
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+    }
+
+    // Load top 10 (using trending/week)
+    async function loadTop10() {
+        try {
+            const data = await tmdbFetch(`https://api.themoviedb.org/3/trending/movie/week`);
+            const movies = data.results.slice(0, 10);
+            const carousel = document.getElementById('top10Carousel');
+            carousel.innerHTML = '';
+            movies.forEach(movie => {
+                const div = document.createElement('div');
+                div.className = 'carousel-item';
+                div.onclick = () => playMovie(movie.id, movie.title);
+                div.innerHTML = `
+                    <img src="${movie.poster_path ? IMG_BASE + movie.poster_path : 'https://placehold.co/300x450'}" alt="${movie.title}">
+                    <div class="info"><h4>${movie.title}</h4></div>
+                `;
+                carousel.appendChild(div);
+            });
+        } catch(e) { console.error(e); }
+    }
+
+    // Load content (infinite scroll)
+    async function loadContent(reset = true) {
+        if (reset) {
+            currentPage = 1;
+            hasMore = true;
+            document.getElementById('moviesContainer').innerHTML = '';
+        }
+        if (isLoading || !hasMore) return;
+        isLoading = true;
+        let endpoint = '';
+        if (currentMediaType === 'anime') {
+            // For anime we use TMDB's TV with genre 16 (Animation) but also filter? Simpler: use trending/tv
+            endpoint = `https://api.themoviedb.org/3/trending/tv/week?page=${currentPage}`;
+        } else if (currentMediaType === 'movie') {
+            if (currentCategory === 'trending') endpoint = `https://api.themoviedb.org/3/trending/movie/week?page=${currentPage}`;
+            else if (currentCategory === 'popular') endpoint = `https://api.themoviedb.org/3/movie/popular?page=${currentPage}`;
+            else endpoint = `https://api.themoviedb.org/3/movie/top_rated?page=${currentPage}`;
+        } else if (currentMediaType === 'tv') {
+            if (currentCategory === 'trending') endpoint = `https://api.themoviedb.org/3/trending/tv/week?page=${currentPage}`;
+            else if (currentCategory === 'popular') endpoint = `https://api.themoviedb.org/3/tv/popular?page=${currentPage}`;
+            else endpoint = `https://api.themoviedb.org/3/tv/top_rated?page=${currentPage}`;
+        }
+        try {
+            const data = await tmdbFetch(endpoint);
+            const results = data.results || [];
+            if (results.length === 0) hasMore = false;
+            displayItems(results);
+            currentPage++;
+        } catch(e) { console.error(e); }
+        isLoading = false;
+    }
+
+    function displayItems(items) {
+        const container = document.getElementById('moviesContainer');
+        let grid = container.querySelector('.movies-grid');
+        if (!grid) {
+            grid = document.createElement('div');
+            grid.className = 'movies-grid';
+            container.appendChild(grid);
+        }
+        items.forEach(item => {
+            const title = item.title || item.name;
+            const poster = item.poster_path ? IMG_BASE + item.poster_path : 'https://placehold.co/300x450';
+            const year = item.release_date ? item.release_date.split('-')[0] : (item.first_air_date ? item.first_air_date.split('-')[0] : '');
+            const isHindi = item.spoken_languages ? item.spoken_languages.some(lang => lang.iso_639_1 === 'hi') : false;
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.onclick = () => {
+                if (currentMediaType === 'movie') playMovie(item.id, title);
+                else if (currentMediaType === 'tv') playTVSeries(item.id, title);
+                else if (currentMediaType === 'anime') playAnime(item.id, title);
+            };
+            card.innerHTML = `
+                ${isHindi ? '<div class="hindi-badge">हिंदी</div>' : ''}
+                <img src="${poster}" alt="${title}">
+                <div class="info"><h3>${title}</h3><p>${year}</p></div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Play functions with server switching & ambient mode
+    let ambientEnabled = true;
+    const colorThief = new ColorThief();
+    function setAmbientColor(imageUrl) {
+        if (!ambientEnabled) return;
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.src = imageUrl;
+        img.onload = () => {
+            try {
+                const color = colorThief.getColor(img);
+                const bgColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+                document.getElementById('ambientOverlay').style.background = `radial-gradient(circle, ${bgColor}20, #020408)`;
+                document.body.style.backgroundColor = `rgba(${color[0]}, ${color[1]}, ${color[2]}, 0.1)`;
+            } catch(e) {}
+        };
+    }
+
+    function playMovie(id, title) {
+        currentPlayingItem = { type: 'movie', id, title };
+        currentServerList = EMBED.movie.map(fn => fn(id));
+        currentEmbedIndex = 0;
+        showPlayer(title, 'movie');
+        loadEmbed(currentEmbedIndex);
+        // Fetch poster for ambient
+        tmdbFetch(`https://api.themoviedb.org/3/movie/${id}`).then(m => {
+            if (m.poster_path) setAmbientColor(IMG_BASE + m.poster_path);
+        });
+        saveResume({ type: 'movie', id, title, timestamp: Date.now() });
+    }
+
+    function playTVSeries(id, title) {
+        currentPlayingItem = { type: 'tv', id, title };
+        showEpisodeSelector(id, title);
+    }
+
+    function playAnime(id, title) {
+        currentPlayingItem = { type: 'anime', id, title };
+        currentServerList = EMBED.anime.map(fn => fn(id));
+        currentEmbedIndex = 0;
+        showPlayer(title, 'anime');
+        loadEmbed(currentEmbedIndex);
+        saveResume({ type: 'anime', id, title, timestamp: Date.now() });
+    }
+
+    function showEpisodeSelector(tvId, title) {
+        // Simplified: just show season/episode selection
+        document.getElementById('playerSection').style.display = 'block';
+        document.getElementById('moviesContainer').style.display = 'none';
+        document.getElementById('playerTitle').innerHTML = `📺 ${title}`;
+        const epDiv = document.getElementById('episodeSelector');
+        epDiv.style.display = 'flex';
+        epDiv.innerHTML = `
+            <span>Season:</span><select id="seasonSelect"><option value="1">1</option><option value="2">2</option></select>
+            <span>Episode:</span><select id="episodeSelect"><option value="1">1</option></select>
+            <button id="playEpBtn">Play</button>
+        `;
+        document.getElementById('playEpBtn').onclick = async () => {
+            const s = document.getElementById('seasonSelect').value;
+            const e = document.getElementById('episodeSelect').value;
+            currentPlayingItem = { type: 'tv', id: tvId, title, season: s, episode: e };
+            currentServerList = EMBED.tv.map(fn => fn(tvId, s, e));
+            currentEmbedIndex = 0;
+            showPlayer(`${title} S${s}E${e}`, 'tv');
+            loadEmbed(currentEmbedIndex);
+            saveResume({ type: 'tv', id: tvId, title, season: s, episode: e, timestamp: Date.now() });
+        };
+    }
+
+    function showPlayer(titleText, mediaType) {
+        document.getElementById('playerSection').style.display = 'block';
+        document.getElementById('moviesContainer').style.display = 'none';
+        document.getElementById('playerTitle').innerHTML = `🎬 ${titleText}`;
+        const serverDiv = document.getElementById('serverSwitch');
+        serverDiv.innerHTML = '';
+        currentServerList.forEach((_, idx) => {
+            const btn = document.createElement('button');
+            btn.textContent = `Server ${idx+1}`;
+            btn.className = `server-btn ${idx === currentEmbedIndex ? 'active' : ''}`;
+            btn.onclick = () => {
+                currentEmbedIndex = idx;
+                loadEmbed(idx);
+                document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            };
+            serverDiv.appendChild(btn);
+        });
+        document.getElementById('currentServerInfo').innerHTML = `Currently playing: Server ${currentEmbedIndex+1}`;
+    }
+
+    function loadEmbed(index) {
+        const url = currentServerList[index];
+        const iframe = `<iframe src="${url}" allowfullscreen allow="autoplay; encrypted-media" frameborder="0"></iframe>`;
+        document.getElementById('videoWrapper').innerHTML = iframe;
+        document.getElementById('currentServerInfo').innerHTML = `Currently playing: Server ${index+1} - ${new URL(url).hostname}`;
+    }
+
+    function saveResume(item) {
+        localStorage.setItem('resumeWatching', JSON.stringify(item));
+    }
+
+    function checkResume() {
+        if (resumeData) {
+            const confirm = window.confirm(`Resume watching "${resumeData.title}"?`);
+            if (confirm) {
+                if (resumeData.type === 'movie') playMovie(resumeData.id, resumeData.title);
+                else if (resumeData.type === 'tv') playTVSeries(resumeData.id, resumeData.title);
+                else if (resumeData.type === 'anime') playAnime(resumeData.id, resumeData.title);
+            }
+        }
+    }
+
+    // Infinite scroll observer
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+            loadContent(false);
+        }
+    }, { threshold: 0.1 });
+    const sentinel = document.createElement('div');
+    sentinel.style.height = '10px';
+    document.getElementById('moviesContainer').appendChild(sentinel);
+    observer.observe(sentinel);
+
+    // Category switching
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentMediaType = btn.getAttribute('data-type');
+            currentCategory = btn.getAttribute('data-cat');
+            currentPage = 1;
+            hasMore = true;
+            document.getElementById('moviesContainer').innerHTML = '';
+            if (currentMediaType === 'anime') {
+                document.getElementById('top10Container').style.display = 'none';
+            } else {
+                document.getElementById('top10Container').style.display = 'block';
+                loadTop10();
+            }
+            loadContent(true);
+        });
+    });
+
+    // Search
+    document.getElementById('searchBtn').addEventListener('click', async () => {
+        const query = document.getElementById('searchInput').value;
+        if (!query) return;
+        let endpoint = '';
+        if (currentMediaType === 'movie') endpoint = `https://api.themoviedb.org/3/search/movie?query=${query}`;
+        else if (currentMediaType === 'tv') endpoint = `https://api.themoviedb.org/3/search/tv?query=${query}`;
+        else endpoint = `https://api.themoviedb.org/3/search/tv?query=${query}&with_genres=16`; // anime search hack
+        const data = await tmdbFetch(endpoint);
+        const container = document.getElementById('moviesContainer');
+        container.innerHTML = '';
+        const grid = document.createElement('div');
+        grid.className = 'movies-grid';
+        data.results.forEach(item => {
+            const title = item.title || item.name;
+            const poster = item.poster_path ? IMG_BASE + item.poster_path : '';
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.onclick = () => {
+                if (currentMediaType === 'movie') playMovie(item.id, title);
+                else playTVSeries(item.id, title);
+            };
+            card.innerHTML = `<img src="${poster}"><div class="info"><h3>${title}</h3></div>`;
+            grid.appendChild(card);
+        });
+        container.appendChild(grid);
+    });
+
+    document.getElementById('closePlayerBtn').addEventListener('click', () => {
+        document.getElementById('playerSection').style.display = 'none';
+        document.getElementById('moviesContainer').style.display = 'block';
+        document.getElementById('videoWrapper').innerHTML = '';
+    });
+
+    document.getElementById('ambientToggle').addEventListener('click', () => {
+        ambientEnabled = !ambientEnabled;
+        if (!ambientEnabled) {
+            document.getElementById('ambientOverlay').style.background = '';
+            document.body.style.backgroundColor = '';
+        }
+    });
+
+    loadTop10();
+    loadContent(true);
+    checkResume();
+</script>
+</body>
+</html>
