@@ -4,118 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>UV's Movie World · Stream Movies & TV</title>
-    <meta name="description" content="Watch latest movies and TV series online in HD. A sleek, neon-lit streaming experience with ambient mode.">
-    <meta name="theme-color" content="#0a0f1e">
-    <!-- Favicon: yellow background, black UV -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFD700'/%3E%3Ctext x='50' y='68' font-size='48' text-anchor='middle' fill='black' font-family='Arial' font-weight='bold'%3EUV%3C/text%3E%3C/svg%3E">
-    <!-- Color Thief for Ambient Mode -->
-    <script src="https://cdn.jsdelivr.net/npm/colorthief@2.3.2/dist/color-thief.umd.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Poppins', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
 
-        /* --- Greyish/Funk & Neon Theme --- */
         body {
-            background: linear-gradient(145deg, #0f1219 0%, #080a10 100%);
+            background: linear-gradient(145deg, #0a0712 0%, #03010a 100%);
             min-height: 100vh;
-            color: #e0e4f0;
-            transition: background-color 0.3s ease;
+            color: #f0e6ff;
         }
 
-        /* Ambient Overlay */
-        .ambient-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            transition: background 0.5s ease;
-            pointer-events: none;
-        }
-
-        /* Glassmorphism Wrapper with Neon Border */
-        .glass-wrapper {
+        /* Main Container */
+        .app-container {
             max-width: 1400px;
-            margin: 2rem auto;
-            background: rgba(18, 22, 35, 0.7);
-            backdrop-filter: blur(16px);
-            border-radius: 2rem;
-            border: 1px solid rgba(0, 255, 255, 0.25);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1), 0 20px 40px rgba(0,0,0,0.5);
-            padding: 1.8rem;
-            transition: all 0.3s ease;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        /* Header with Neon Text */
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.3);
-            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;
+            gap: 1rem;
         }
-        .logo {
+        .logo-area {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        .logo svg {
+        .logo-svg {
             width: 48px;
             height: 48px;
-            filter: drop-shadow(0 0 6px cyan);
+            filter: drop-shadow(0 0 8px #c026d3);
         }
         .logo-text {
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #fff, #4dfffc, #00aaff);
+            background: linear-gradient(135deg, #fff, #e879f9, #a21caf);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            text-shadow: 0 0 5px rgba(0,255,255,0.3);
         }
-        .controls {
-            display: flex;
-            gap: 12px;
-        }
-        .ambient-toggle {
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid rgba(0, 255, 255, 0.5);
-            color: #00ffff;
-            padding: 0.4rem 1rem;
+        .badge {
+            background: rgba(192, 38, 211, 0.2);
+            border: 1px solid rgba(192, 38, 211, 0.5);
+            color: #e879f9;
+            padding: 0.3rem 1rem;
             border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
-        }
-        .ambient-toggle:hover {
-            background: rgba(0, 255, 255, 0.3);
-            box-shadow: 0 0 8px cyan;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
-        /* Search Bar with Neon Accent */
-        .search-section {
+        /* Search Bar */
+        .search-wrapper {
             margin-bottom: 2rem;
         }
-        .search-bar {
+        .search-container {
             display: flex;
             gap: 0.8rem;
-            background: rgba(10, 14, 23, 0.8);
+            background: rgba(15, 10, 25, 0.7);
             border-radius: 3rem;
             padding: 0.2rem;
-            border: 1px solid rgba(0, 255, 255, 0.4);
-            transition: box-shadow 0.2s;
+            border: 1px solid rgba(192, 38, 211, 0.4);
+            transition: all 0.3s ease;
         }
-        .search-bar:focus-within {
-            box-shadow: 0 0 12px cyan;
+        .search-container:focus-within {
+            border-color: #c026d3;
+            box-shadow: 0 0 15px rgba(192, 38, 211, 0.4);
         }
-        .search-bar input {
+        .search-container input {
             flex: 1;
             background: transparent;
             border: none;
@@ -124,91 +91,74 @@
             font-size: 1rem;
             outline: none;
         }
-        .search-bar button {
-            background: linear-gradient(95deg, #00ffff, #0088ff);
+        .search-container button {
+            background: linear-gradient(95deg, #c026d3, #a21caf);
             border: none;
             padding: 0 1.8rem;
             border-radius: 3rem;
             font-weight: bold;
-            color: #0a0f1e;
+            color: white;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.2s;
         }
-        .search-bar button:hover {
+        .search-container button:hover {
             transform: scale(1.02);
             filter: brightness(1.05);
         }
 
-        /* Categories - Active Neon Effect */
+        /* Category Buttons */
         .categories {
             display: flex;
             flex-wrap: wrap;
             gap: 0.8rem;
-            margin-top: 1.2rem;
+            margin: 1.5rem 0 2rem;
         }
         .cat-btn {
-            background: rgba(0, 255, 255, 0.1);
-            padding: 0.5rem 1.2rem;
+            background: rgba(192, 38, 211, 0.15);
+            padding: 0.6rem 1.4rem;
             border-radius: 2rem;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s;
             font-size: 0.9rem;
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            color: #ccf4ff;
+            font-weight: 500;
+            border: 1px solid rgba(192, 38, 211, 0.3);
+            color: #e9d5ff;
         }
         .cat-btn.active, .cat-btn:hover {
-            background: #00ffff;
-            color: #0a0f1e;
-            border-color: #00ffff;
-            box-shadow: 0 0 10px cyan;
-            font-weight: bold;
+            background: #c026d3;
+            color: white;
+            border-color: #c026d3;
+            box-shadow: 0 0 12px rgba(192, 38, 211, 0.5);
         }
 
-        /* Top 10 Carousel */
-        .top10-container {
-            margin-bottom: 2rem;
-        }
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        /* Server Toggle Dropdown */
+        .server-selector {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: #00ffff;
-            text-shadow: 0 0 3px cyan;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: rgba(15, 10, 25, 0.5);
+            padding: 0.8rem 1.2rem;
+            border-radius: 3rem;
+            width: fit-content;
+            border: 1px solid rgba(192, 38, 211, 0.3);
         }
-        .carousel {
-            display: flex;
-            gap: 1.2rem;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 0.8rem;
+        .server-selector label {
+            font-weight: 600;
+            color: #e879f9;
         }
-        .carousel-item {
-            min-width: 170px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 1rem;
-            overflow: hidden;
+        #serverSelect {
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: 1px solid #c026d3;
+            border-radius: 2rem;
+            padding: 0.4rem 1rem;
+            outline: none;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(0, 255, 255, 0.4);
-        }
-        .carousel-item:hover {
-            transform: translateY(-5px);
-            border-color: cyan;
-            box-shadow: 0 0 15px rgba(0,255,255,0.4);
-        }
-        .carousel-item img {
-            width: 100%;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-        }
-        .carousel-item .info {
-            padding: 0.6rem;
-            text-align: center;
+            font-size: 0.9rem;
         }
 
-        /* Infinite Scroll Grid */
+        /* Movie Grid - Infinite Scroll */
         .movies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -216,19 +166,19 @@
             margin-top: 1rem;
         }
         .movie-card {
-            background: rgba(20, 26, 45, 0.7);
-            backdrop-filter: blur(6px);
-            border-radius: 1.2rem;
+            background: rgba(20, 15, 35, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 1rem;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.25s ease;
-            border: 1px solid rgba(0, 255, 255, 0.2);
+            border: 1px solid rgba(192, 38, 211, 0.3);
             position: relative;
         }
         .movie-card:hover {
-            transform: translateY(-8px);
-            border-color: #00ffff;
-            box-shadow: 0 10px 25px -5px rgba(0,255,255,0.3);
+            transform: translateY(-6px);
+            border-color: #c026d3;
+            box-shadow: 0 10px 25px -5px rgba(192, 38, 211, 0.4);
         }
         .movie-card img {
             width: 100%;
@@ -240,24 +190,30 @@
         }
         .movie-card .info h3 {
             font-size: 0.9rem;
+            font-weight: 600;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            color: #00ffff;
+            color: #f0e6ff;
+        }
+        .movie-card .info p {
+            font-size: 0.75rem;
+            color: #c084fc;
+            margin-top: 0.3rem;
         }
 
-        /* Player Section - Sleek & Clean */
+        /* Player Section */
         .player-section {
             margin-top: 2rem;
             display: none;
         }
-        .player-glass {
-            background: rgba(10, 14, 23, 0.95);
-            border-radius: 1.5rem;
+        .player-card {
+            background: rgba(10, 6, 20, 0.95);
+            border-radius: 1.2rem;
             padding: 1.2rem;
-            backdrop-filter: blur(20px);
-            border: 1px solid #00ffff;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border: 1px solid #c026d3;
+            box-shadow: 0 0 25px rgba(192, 38, 211, 0.3);
         }
         .player-header {
             display: flex;
@@ -265,40 +221,31 @@
             align-items: center;
             flex-wrap: wrap;
             margin-bottom: 1rem;
-            gap: 12px;
+            gap: 1rem;
         }
         #playerTitle {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #00ffff;
-        }
-        .lang-btn, .close-player {
-            background: #1e2a3a;
-            border: 1px solid cyan;
-            color: white;
-            padding: 0.3rem 1rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .lang-btn.active {
-            background: #00ffff;
-            color: black;
-            font-weight: bold;
+            color: #e879f9;
         }
         .close-player {
-            background: rgba(220, 20, 60, 0.8);
-            border-color: crimson;
+            background: rgba(180, 30, 50, 0.9);
+            border: none;
+            color: white;
+            padding: 0.4rem 1.2rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
         }
         .close-player:hover {
-            background: crimson;
+            background: #dc2626;
         }
         .video-wrapper {
             position: relative;
             padding-bottom: 56.25%;
             height: 0;
-            border-radius: 1rem;
+            border-radius: 0.8rem;
             overflow: hidden;
             background: #000;
         }
@@ -311,7 +258,7 @@
             border: none;
         }
         .episode-selector {
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
             display: flex;
             gap: 1rem;
             align-items: center;
@@ -319,57 +266,39 @@
         }
         .loading-spinner {
             text-align: center;
-            padding: 2rem;
-            color: #00ffff;
+            padding: 3rem;
+            color: #e879f9;
         }
         footer {
             text-align: center;
-            margin-top: 2.5rem;
+            margin-top: 3rem;
             font-size: 0.7rem;
-            opacity: 0.7;
-            color: #aaa;
-        }
-
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a1e2c;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #00ffff;
-            border-radius: 10px;
+            opacity: 0.6;
+            color: #a78bfa;
         }
 
         @media (max-width: 640px) {
-            .glass-wrapper { margin: 1rem; padding: 1rem; }
+            .app-container { padding: 1rem; }
             .movies-grid { gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .carousel-item { min-width: 130px; }
             .logo-text { font-size: 1.3rem; }
         }
     </style>
 </head>
 <body>
-<div id="ambientOverlay" class="ambient-overlay"></div>
-<div class="glass-wrapper">
+<div class="app-container">
     <div class="header">
-        <div class="logo">
-            <svg width="48" height="48" viewBox="0 0 100 100">
-                <rect width="100" height="100" rx="20" fill="#FFD700"/>
-                <text x="50" y="68" font-size="46" text-anchor="middle" fill="black" font-family="Arial" font-weight="bold">UV</text>
+        <div class="logo-area">
+            <svg class="logo-svg" width="48" height="48" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" rx="20" fill="#c026d3"/>
+                <text x="50" y="68" font-size="46" text-anchor="middle" fill="white" font-family="Inter, sans-serif" font-weight="bold">UV</text>
             </svg>
             <span class="logo-text">UV's Movie World</span>
         </div>
-        <div class="controls">
-            <button class="ambient-toggle" id="ambientToggle">🌙 Ambient Mode</button>
-        </div>
+        <div class="badge">✨ Cinematic Experience ✨</div>
     </div>
 
-    <div class="search-section">
-        <div class="search-bar">
+    <div class="search-wrapper">
+        <div class="search-container">
             <input type="text" id="searchInput" placeholder="Search movies or TV shows...">
             <button id="searchBtn">🔍 Search</button>
         </div>
@@ -381,64 +310,71 @@
         </div>
     </div>
 
-    <div class="top10-container" id="top10Container">
-        <div class="section-title">🏆 Top 10 This Week</div>
-        <div class="carousel" id="top10Carousel"></div>
+    <!-- Server Selector Dropdown -->
+    <div class="server-selector">
+        <label>🎥 Streaming Server:</label>
+        <select id="serverSelect">
+            <option value="vidsrc">VidSrc (Default)</option>
+            <option value="2embed">2Embed</option>
+            <option value="autoembed">AutoEmbed</option>
+            <option value="vidfast">VidFast</option>
+        </select>
     </div>
 
     <div id="moviesContainer">
-        <div class="loading-spinner">🎬 Loading cinematic experience...</div>
+        <div class="loading-spinner">🎬 Loading cinematic universe...</div>
     </div>
 
     <div id="playerSection" class="player-section">
-        <div class="player-glass">
+        <div class="player-card">
             <div class="player-header">
                 <div id="playerTitle"></div>
-                <div>
-                    <button class="lang-btn" id="langToggleBtn">🇮🇳 Hindi Dubbed</button>
-                    <button class="close-player" id="closePlayerBtn">✕ Close Player</button>
-                </div>
+                <button class="close-player" id="closePlayerBtn">✕ Close Player</button>
             </div>
             <div id="episodeSelector" class="episode-selector" style="display: none;"></div>
             <div class="video-wrapper" id="videoWrapper"></div>
-            <div id="currentServerInfo" style="font-size:0.7rem; margin-top:10px; text-align:center; color:#00ffff;"></div>
+            <div id="currentServerInfo" style="font-size:0.7rem; margin-top:10px; text-align:center; color:#c084fc;"></div>
         </div>
     </div>
 
-    <footer>⚡ Powered by TMDB · Streaming via Vidking · Ambient Experience ⚡</footer>
+    <footer>⚡ Powered by TMDB · Multi-Server Streaming · Ad-Free Experience ⚡</footer>
 </div>
 
 <script>
-    // =================== TMDB CONFIGURATION ===================
+    // ========== TMDB API ==========
     const TMDB_API_KEY = "8af9b49a95ed3ebb5d577d1e0bdfb868";
     const IMG_BASE = "https://image.tmdb.org/t/p/w300";
 
-    // =================== SINGLE VIDKING SERVER ===================
-    function getVidkingUrl(id, type, season = null, episode = null) {
-        if (type === 'movie') {
-            return `https://www.vidking.net/embed/movie/${id}`;
-        } else if (type === 'tv') {
-            return `https://www.vidking.net/embed/tv/${id}/${season}/${episode}`;
+    // ========== Embed Server Mapping ==========
+    const EMBED_SERVERS = {
+        vidsrc: {
+            movie: (id) => `https://vidsrc.xyz/embed/movie/${id}`,
+            tv: (id, season, episode) => `https://vidsrc.xyz/embed/tv/${id}/${season}/${episode}`
+        },
+        '2embed': {
+            movie: (id) => `https://2embed.cc/embed/movie/${id}`,
+            tv: (id, season, episode) => `https://2embed.cc/embed/tv/${id}/${season}/${episode}`
+        },
+        autoembed: {
+            movie: (id) => `https://autoembed.co/movie/${id}`,
+            tv: (id, season, episode) => `https://autoembed.co/tv/${id}/${season}/${episode}`
+        },
+        vidfast: {
+            movie: (id) => `https://vidfast.app/movie/${id}`,
+            tv: (id, season, episode) => `https://vidfast.app/tv/${id}/${season}/${episode}`
         }
-        return '';
-    }
+    };
 
-    // =================== APPLICATION STATE ===================
+    // ========== App State ==========
     let currentMediaType = "movie";
     let currentCategory = "trending";
     let currentPage = 1;
     let isLoading = false;
     let hasMore = true;
     let currentPlayingItem = null;
-    let isHindiMode = false;
     let currentSeason = null, currentEpisode = null;
-    let resumeData = JSON.parse(localStorage.getItem('resumeWatching')) || null;
 
-    // Ambient Mode State
-    let ambientEnabled = true;
-    const colorThief = new ColorThief();
-
-    // =================== TMDB API HELPER ===================
+    // ========== Helper Functions ==========
     async function tmdbFetch(endpoint) {
         const url = `https://api.themoviedb.org/3/${endpoint}&api_key=${TMDB_API_KEY}`;
         const response = await fetch(url);
@@ -446,39 +382,21 @@
         return response.json();
     }
 
-    // =================== AMBIENT MODE (Auto on Play) ===================
-    function setAmbientColorFromPoster(posterUrl) {
-        if (!ambientEnabled) return;
-        const img = new Image();
-        img.crossOrigin = 'Anonymous';
-        img.src = posterUrl;
-        img.onload = () => {
-            try {
-                const dominantColor = colorThief.getColor(img);
-                const overlay = document.getElementById('ambientOverlay');
-                overlay.style.background = `radial-gradient(circle at 50% 30%, rgba(${dominantColor[0]}, ${dominantColor[1]}, ${dominantColor[2]}, 0.4), #020408 90%)`;
-            } catch(e) { console.warn("Ambient color extraction failed"); }
-        };
+    function getCurrentEmbedUrl(id, type, season = null, episode = null) {
+        const selectedServer = document.getElementById('serverSelect').value;
+        const server = EMBED_SERVERS[selectedServer];
+        if (!server) return EMBED_SERVERS.vidsrc[type](id, season, episode);
+        if (type === 'movie') return server.movie(id);
+        if (type === 'tv') return server.tv(id, season, episode);
+        return '';
     }
 
-    async function applyAmbientForItem(id, type) {
-        try {
-            let endpoint = type === 'movie' ? `movie/${id}` : `tv/${id}`;
-            let data = await tmdbFetch(endpoint);
-            if (data.poster_path) {
-                setAmbientColorFromPoster(IMG_BASE + data.poster_path);
-            }
-        } catch(e) {}
-    }
-
-    // =================== PLAYER LOGIC (Single Vidking Server) ===================
-    function loadEmbed(mediaId, type, title, season = null, episode = null) {
-        const embedUrl = getVidkingUrl(mediaId, type, season, episode);
+    function loadEmbed(id, type, title, season = null, episode = null) {
+        const embedUrl = getCurrentEmbedUrl(id, type, season, episode);
         const iframeHtml = `<iframe src="${embedUrl}" referrerpolicy="no-referrer" allowfullscreen allow="autoplay; encrypted-media" frameborder="0"></iframe>`;
         document.getElementById('videoWrapper').innerHTML = iframeHtml;
-        document.getElementById('currentServerInfo').innerHTML = `🎬 Streaming via Vidking · ${new URL(embedUrl).hostname}`;
-        // Activate ambient mode with the movie's poster
-        applyAmbientForItem(mediaId, type);
+        const serverName = document.getElementById('serverSelect').options[document.getElementById('serverSelect').selectedIndex].text;
+        document.getElementById('currentServerInfo').innerHTML = `🎬 Now playing on ${serverName} · Powered by ${embedUrl}`;
     }
 
     function showPlayer(titleText) {
@@ -506,18 +424,17 @@
         const epDiv = document.getElementById('episodeSelector');
         epDiv.style.display = 'flex';
         epDiv.innerHTML = `
-            <span style="color:#0ff;">Season:</span> <select id="seasonSelect"><option value="1">1</option><option value="2">2</option></select>
-            <span style="color:#0ff;">Episode:</span> <select id="episodeSelect"><option value="1">1</option></select>
-            <button id="playEpBtn" style="background:cyan; border:none; padding:0.3rem 1rem; border-radius:2rem; color:black;">▶ Play</button>
+            <span style="color:#e879f9;">Season:</span> <select id="seasonSelect"><option value="1">1</option></select>
+            <span style="color:#e879f9;">Episode:</span> <select id="episodeSelect"><option value="1">1</option></select>
+            <button id="playEpBtn" style="background:#c026d3; border:none; padding:0.3rem 1rem; border-radius:2rem; color:white; cursor:pointer;">▶ Play</button>
         `;
-        // Fetch actual seasons (simplified but works)
         fetch(`https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`)
             .then(res => res.json())
             .then(data => {
                 if (data.number_of_seasons) {
                     const sSelect = document.getElementById('seasonSelect');
                     sSelect.innerHTML = '';
-                    for (let i = 1; i <= Math.min(data.number_of_seasons, 8); i++) {
+                    for (let i = 1; i <= Math.min(data.number_of_seasons, 6); i++) {
                         const opt = document.createElement('option');
                         opt.value = i; opt.textContent = `Season ${i}`;
                         sSelect.appendChild(opt);
@@ -539,14 +456,14 @@
     function updateEpisodeSelect(season) {
         const epSelect = document.getElementById('episodeSelect');
         epSelect.innerHTML = '';
-        for (let i = 1; i <= 20; i++) {
+        for (let i = 1; i <= 15; i++) {
             const opt = document.createElement('option');
             opt.value = i; opt.textContent = `Episode ${i}`;
             epSelect.appendChild(opt);
         }
     }
 
-    // =================== INFINITE SCROLL + CONTENT LOADING ===================
+    // ========== Infinite Scroll & Content Loading ==========
     async function loadContent(reset = true) {
         if (reset) {
             currentPage = 1;
@@ -590,7 +507,7 @@
         }
         items.forEach(item => {
             const title = item.title || item.name;
-            const poster = item.poster_path ? IMG_BASE + item.poster_path : 'https://placehold.co/300x450/1a1e2c/cyan?text=No+Image';
+            const poster = item.poster_path ? IMG_BASE + item.poster_path : 'https://placehold.co/300x450/1e1a2e/a855f7?text=No+Image';
             const year = item.release_date ? item.release_date.split('-')[0] : (item.first_air_date ? item.first_air_date.split('-')[0] : 'N/A');
             const card = document.createElement('div');
             card.className = 'movie-card';
@@ -603,24 +520,33 @@
         });
     }
 
-    // =================== TOP 10 CAROUSEL ===================
+    // ========== Top 10 Carousel ==========
     async function loadTop10() {
         try {
             const data = await tmdbFetch(`trending/movie/week?page=1`);
             const movies = data.results.slice(0, 10);
-            const carousel = document.getElementById('top10Carousel');
-            carousel.innerHTML = '';
+            const container = document.getElementById('moviesContainer');
+            const top10Section = document.createElement('div');
+            top10Section.className = 'top10-section';
+            top10Section.innerHTML = `<div class="section-title" style="font-size:1.2rem; margin-bottom:1rem; color:#e879f9;">🏆 Top 10 This Week</div><div class="carousel" id="top10Carousel" style="display:flex; gap:1rem; overflow-x:auto; margin-bottom:2rem;"></div>`;
+            const carousel = top10Section.querySelector('#top10Carousel');
             movies.forEach(movie => {
                 const div = document.createElement('div');
                 div.className = 'carousel-item';
+                div.style.minWidth = '150px';
+                div.style.background = 'rgba(0,0,0,0.5)';
+                div.style.borderRadius = '0.8rem';
+                div.style.overflow = 'hidden';
+                div.style.cursor = 'pointer';
                 div.onclick = () => playMovie(movie.id, movie.title);
-                div.innerHTML = `<img src="${movie.poster_path ? IMG_BASE + movie.poster_path : 'https://placehold.co/300x450'}" alt="${movie.title}"><div class="info"><h4>${movie.title}</h4></div>`;
+                div.innerHTML = `<img src="${movie.poster_path ? IMG_BASE + movie.poster_path : 'https://placehold.co/300x450'}" style="width:100%; aspect-ratio:2/3; object-fit:cover;"><div style="padding:0.5rem; text-align:center;"><h4 style="font-size:0.8rem;">${movie.title}</h4></div>`;
                 carousel.appendChild(div);
             });
+            container.prepend(top10Section);
         } catch(e) { console.error("Top10 failed"); }
     }
 
-    // =================== SEARCH FUNCTIONALITY ===================
+    // ========== Search ==========
     document.getElementById('searchBtn').addEventListener('click', async () => {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
@@ -645,7 +571,7 @@
         container.appendChild(grid);
     });
 
-    // =================== CATEGORY SWITCHING ===================
+    // ========== Category Switching ==========
     function attachCategoryEvents() {
         document.querySelectorAll('.cat-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -655,14 +581,13 @@
                 currentCategory = btn.getAttribute('data-cat');
                 currentPage = 1; hasMore = true;
                 document.getElementById('moviesContainer').innerHTML = '';
-                if (currentMediaType === 'movie') loadTop10();
-                else document.getElementById('top10Container').style.display = 'none';
+                loadTop10();
                 loadContent(true);
             });
         });
     }
 
-    // =================== INFINITE SCROLL OBSERVER ===================
+    // ========== Infinite Scroll Observer ==========
     function setupInfiniteScroll() {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !isLoading && hasMore) {
@@ -675,31 +600,28 @@
         observer.observe(sentinel);
     }
 
-    // =================== EVENT LISTENERS ===================
-    document.getElementById('langToggleBtn').addEventListener('click', () => {
-        isHindiMode = !isHindiMode;
-        document.getElementById('langToggleBtn').classList.toggle('active', isHindiMode);
-        alert(`Hindi mode ${isHindiMode ? 'enabled' : 'disabled'}. Refresh or reload movie for effect.`);
-        if (currentPlayingItem && currentPlayingItem.type === 'movie') {
-            playMovie(currentPlayingItem.id, currentPlayingItem.title);
-        }
-    });
+    // ========== Event Listeners ==========
     document.getElementById('closePlayerBtn').addEventListener('click', () => {
         document.getElementById('playerSection').style.display = 'none';
         document.getElementById('moviesContainer').style.display = 'block';
         document.getElementById('videoWrapper').innerHTML = '';
     });
-    document.getElementById('ambientToggle').addEventListener('click', () => {
-        ambientEnabled = !ambientEnabled;
-        if (!ambientEnabled) document.getElementById('ambientOverlay').style.background = '';
-        else document.getElementById('ambientOverlay').style.background = '';
+    document.getElementById('serverSelect').addEventListener('change', () => {
+        if (currentPlayingItem) {
+            if (currentPlayingItem.type === 'movie') playMovie(currentPlayingItem.id, currentPlayingItem.title);
+            else if (currentPlayingItem.type === 'tv' && currentSeason && currentEpisode) {
+                loadEmbed(currentPlayingItem.id, 'tv', currentPlayingItem.title, currentSeason, currentEpisode);
+            }
+        }
     });
+
+    let resumeData = JSON.parse(localStorage.getItem('resumeWatching')) || null;
     if (resumeData && confirm(`Resume watching "${resumeData.title}"?`)) {
         if (resumeData.type === 'movie') playMovie(resumeData.id, resumeData.title);
         else if (resumeData.type === 'tv') playTVSeries(resumeData.id, resumeData.title);
     }
 
-    // =================== INITIALIZATION ===================
+    // ========== Initialize ==========
     loadTop10();
     loadContent(true);
     attachCategoryEvents();
